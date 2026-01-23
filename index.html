@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Analysis Dashboard</title>
+    <meta http-equiv="refresh" content="300">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0a0a0a;
+            --border: #1a1a1a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #999;
+            --text-tertiary: #666;
+            --accent: #fff;
+            --positive: #4a7c59;
+            --negative: #7c4a4a;
+            --neutral: #7c7c4a;
+        }
+
+        [data-theme="day"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #fff;
+            --border: #e5e5e5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent: #000;
+            --positive: #16a34a;
+            --negative: #dc2626;
+            --neutral: #ea580c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .theme-toggle:hover, .refresh-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-tertiary);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .price {
+            font-size: 3.5em;
+            font-weight: 200;
+            margin: 20px 0;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+        }
+
+        .meta {
+            color: var(--text-tertiary);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            margin-bottom: 1px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .positive { color: var(--positive); }
+        .negative { color: var(--negative); }
+        .neutral { color: var(--neutral); }
+
+        .section {
+            margin: 60px 0;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        .levels {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .level {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+
+        .level:last-child {
+            border-bottom: none;
+        }
+
+        .level.current {
+            background: var(--bg-primary);
+            border-left: 2px solid var(--accent);
+        }
+
+        .level-price {
+            font-size: 1.1em;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .level-label {
+            color: var(--text-tertiary);
+            font-size: 0.85em;
+        }
+
+        .level-distance {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0;
+            margin-bottom: 1px;
+            transition: background 0.3s ease;
+        }
+
+        .signals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .signal-section {
+            background: var(--bg-secondary);
+            padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .signal-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .signal-list {
+            list-style: none;
+        }
+
+        .signal-list li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .signal-list li:before {
+            content: "—";
+            margin-right: 10px;
+            color: var(--text-tertiary);
+        }
+
+        .scenarios {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .scenario {
+            background: var(--bg-secondary);
+            padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .scenario-header {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .scenario-trigger {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .target {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 0.95em;
+            color: var(--text-primary);
+        }
+
+        .probability {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .prob-bar {
+            height: 2px;
+            background: var(--border);
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.5s ease;
+        }
+
+        .prob-value {
+            font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
+        }
+
+        .summary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        .summary-title {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .bias-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .bias-item {
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease;
+        }
+
+        .bias-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+
+        .bias-value {
+            font-size: 1.1em;
+            color: var(--text-primary);
+        }
+
+        .watch-levels {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .signals {
+                grid-template-columns: 1fr;
+            }
+            .scenarios {
+                grid-template-columns: 1fr;
+            }
+            .bias-grid {
+                grid-template-columns: 1fr;
+            }
+            .price {
+                font-size: 2.5em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .controls {
+                width: 100%;
+                flex-direction: column;
+            }
+            .theme-toggle, .refresh-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Bitcoin Analysis</h1>
+                <div class="price" id="livePrice">Loading...</div>
+                <div class="meta" id="lastUpdate">Connecting to Binance...</div>
+            </div>
+            <div class="controls">
+                <button class="refresh-btn" onclick="location.reload()">⟳ Refresh</button>
+                <button class="theme-toggle" onclick="toggleTheme()">Day Mode</button>
+            </div>
+        </div>
+
+        <!-- Main Metrics -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">Price Action</div>
+                <div class="metric-row">
+                    <span class="metric-label">Spot</span>
+                    <span class="metric-value" id="spotPrice">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">24h High</span>
+                    <span class="metric-value" id="high24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Low</span>
+                    <span class="metric-value" id="low24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Change</span>
+                    <span class="metric-value" id="change24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Volume</span>
+                    <span class="metric-value" id="volume24h">—</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">VWAP (15m)</div>
+                <div class="metric-row">
+                    <span class="metric-label">VWAP</span>
+                    <span class="metric-value">$89,421.77</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Distance</span>
+                    <span class="metric-value negative">-0.13%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Position</span>
+                    <span class="metric-value neutral">Near VWAP</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Upper Band (1σ)</span>
+                    <span class="metric-value">$89,720.46</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Lower Band (1σ)</span>
+                    <span class="metric-value">$89,123.07</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Order Book</div>
+                <div class="metric-row">
+                    <span class="metric-label">Spread</span>
+                    <span class="metric-value">$0.01</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Total Bids</span>
+                    <span class="metric-value">$1,639,575</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Total Asks</span>
+                    <span class="metric-value">$860,832</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Bid/Ask Ratio</span>
+                    <span class="metric-value positive">1.905</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Pressure</span>
+                    <span class="metric-value">Strong Buy</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Futures</div>
+                <div class="metric-row">
+                    <span class="metric-label">Funding Rate</span>
+                    <span class="metric-value">0.0034%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Annualized</span>
+                    <span class="metric-value">3.71%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Sentiment</span>
+                    <span class="metric-value">Bullish (weak)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Open Interest</span>
+                    <span class="metric-value">$8.98B</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">OI Change 24h</span>
+                    <span class="metric-value">+0.91%</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Spot vs Futures</div>
+                <div class="metric-row">
+                    <span class="metric-label">Spot Volume</span>
+                    <span class="metric-value">24.43 BTC</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Futures Volume</span>
+                    <span class="metric-value">237.97 BTC</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Ratio</span>
+                    <span class="metric-value negative">0.103</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Dominance</span>
+                    <span class="metric-value">Futures Led</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Correlation</span>
+                    <span class="metric-value">0.997</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Price-OI Analysis</div>
+                <div class="metric-row">
+                    <span class="metric-label">Status</span>
+                    <span class="metric-value neutral">Neutral</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Risk Level</span>
+                    <span class="metric-value">Low</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Price Change (10p)</span>
+                    <span class="metric-value">+0.29%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">OI Change (10p)</span>
+                    <span class="metric-value">+0.32%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Divergences</span>
+                    <span class="metric-value neutral">None</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Chart -->
+        <div class="section">
+            <div class="section-title">Price Chart & Key Levels</div>
+            
+            <div class="chart-container">
+                <div class="tradingview-widget-container" style="height: 500px;">
+                    <div id="tradingview_chart" style="height: 100%;"></div>
+                </div>
+            </div>
+            
+            <div class="levels">
+                <div class="level">
+                    <div>
+                        <div class="level-price">$93,673</div>
+                        <div class="level-label">Weekly Open / Prev Close</div>
+                    </div>
+                    <div class="level-distance">-4.88%</div>
+                </div>
+                <div class="level">
+                    <div>
+                        <div class="level-price">$90,636</div>
+                        <div class="level-label">Monthly POC</div>
+                    </div>
+                    <div class="level-distance">-1.48%</div>
+                </div>
+                <div class="level">
+                    <div>
+                        <div class="level-price">$89,549-560</div>
+                        <div class="level-label">Daily/Weekly POC Cluster</div>
+                    </div>
+                    <div class="level-distance">-0.27%</div>
+                </div>
+                <div class="level current">
+                    <div>
+                        <div class="level-price" style="color: var(--accent);" id="currentLevel">$89,310</div>
+                        <div class="level-label">Current Price</div>
+                    </div>
+                    <div class="level-distance">—</div>
+                </div>
+                <div class="level">
+                    <div>
+                        <div class="level-price">$88,860</div>
+                        <div class="level-label">Daily Low</div>
+                    </div>
+                    <div class="level-distance">+0.51%</div>
+                </div>
+                <div class="level">
+                    <div>
+                        <div class="level-price">$87,648</div>
+                        <div class="level-label">Monthly Open</div>
+                    </div>
+                    <div class="level-distance">+1.86%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signals -->
+        <div class="section">
+            <div class="section-title">Market Signals</div>
+            <div class="signals">
+                <div class="signal-section">
+                    <div class="signal-title">Bullish</div>
+                    <ul class="signal-list">
+                        <li>Strong buy pressure in order book</li>
+                        <li>Rising Open Interest</li>
+                        <li>Positive funding rate</li>
+                        <li>Price above Monthly Open</li>
+                        <li>No price-OI divergence</li>
+                    </ul>
+                </div>
+                <div class="signal-section">
+                    <div class="signal-title">Bearish / Neutral</div>
+                    <ul class="signal-list">
+                        <li>Futures-dominated market</li>
+                        <li>Price below VWAP</li>
+                        <li>Weekly decline</li>
+                        <li>Strong resistance cluster</li>
+                        <li>Weak spot momentum</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenarios -->
+        <div class="section">
+            <div class="section-title">Trading Scenarios</div>
+            <div class="scenarios">
+                <div class="scenario">
+                    <div class="scenario-header">Bullish</div>
+                    <div class="scenario-trigger">Break above $89,550-560 with spot volume</div>
+                    <div class="target">
+                        <span>Target 1</span>
+                        <span>$90,636</span>
+                    </div>
+                    <div class="target">
+                        <span>Target 2</span>
+                        <span>$93,673</span>
+                    </div>
+                    <div class="probability">
+                        <span class="prob-value">30%</span>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario">
+                    <div class="scenario-header">Neutral</div>
+                    <div class="scenario-trigger">Consolidation continues in range</div>
+                    <div class="target">
+                        <span>Range High</span>
+                        <span>$90,000</span>
+                    </div>
+                    <div class="target">
+                        <span>Range Low</span>
+                        <span>$88,000</span>
+                    </div>
+                    <div class="probability">
+                        <span class="prob-value">50%</span>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: 50%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scenario">
+                    <div class="scenario-header">Bearish</div>
+                    <div class="scenario-trigger">Rejection from $89,550 resistance</div>
+                    <div class="target">
+                        <span>Target 1</span>
+                        <span>$87,648</span>
+                    </div>
+                    <div class="target">
+                        <span>Target 2</span>
+                        <span>$87,264</span>
+                    </div>
+                    <div class="probability">
+                        <span class="prob-value">20%</span>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: 20%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <div class="summary">
+                <div class="summary-title">Trading Bias</div>
+                <div class="bias-grid">
+                    <div class="bias-item">
+                        <div class="bias-label">Short-term</div>
+                        <div class="bias-value">Neutral → Bearish</div>
+                    </div>
+                    <div class="bias-item">
+                        <div class="bias-label">Medium-term</div>
+                        <div class="bias-value">Range-bound</div>
+                    </div>
+                    <div class="bias-item">
+                        <div class="bias-label">Conviction</div>
+                        <div class="bias-value">Medium</div>
+                    </div>
+                </div>
+                <div class="watch-levels">
+                    Resistance: $89,550 (break = bullish)<br>
+                    Support: $88,860 (break = bearish)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <script>
+        let currentTheme = localStorage.getItem('theme') || 'night';
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const button = document.querySelector('.theme-toggle');
+            
+            if (currentTheme === 'day') {
+                html.removeAttribute('data-theme');
+                button.textContent = 'Day Mode';
+                currentTheme = 'night';
+            } else {
+                html.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+                currentTheme = 'day';
+            }
+            
+            localStorage.setItem('theme', currentTheme);
+            initTradingView();
+        }
+
+        async function fetchLiveData() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+                const data = await response.json();
+                
+                const price = parseFloat(data.lastPrice);
+                const change = parseFloat(data.priceChangePercent);
+                
+                document.getElementById('livePrice').textContent = '$' + price.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                document.getElementById('spotPrice').textContent = '$' + price.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                document.getElementById('currentLevel').textContent = '$' + Math.round(price).toLocaleString('en-US');
+                
+                document.getElementById('high24h').textContent = '$' + parseFloat(data.highPrice).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                document.getElementById('low24h').textContent = '$' + parseFloat(data.lowPrice).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                const changeEl = document.getElementById('change24h');
+                changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+                changeEl.className = 'metric-value ' + (change >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('volume24h').textContent = parseFloat(data.volume).toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }) + ' BTC';
+                
+                const now = new Date();
+                document.getElementById('lastUpdate').textContent = 
+                    'Last update: ' + now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC • Auto-refresh: 5min';
+                    
+            } catch (error) {
+                console.log('Using static data (CORS limitation)');
+                document.getElementById('livePrice').textContent = '$89,310.87';
+                document.getElementById('lastUpdate').textContent = 'Using cached data • Refresh page for updates';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const button = document.querySelector('.theme-toggle');
+            if (currentTheme === 'day') {
+                document.documentElement.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+            }
+            
+            fetchLiveData();
+            initTradingView();
+        });
+
+        function initTradingView() {
+            const container = document.getElementById('tradingview_chart');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const isDark = currentTheme === 'night';
+            
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "BINANCE:BTCUSDT",
+                "interval": "15",
+                "timezone": "Etc/UTC",
+                "theme": isDark ? "dark" : "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": isDark ? "#0a0a0a" : "#fafafa",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": false,
+                "studies": ["VWAP@tv-basicstudies"],
+                "container_id": "tradingview_chart",
+                "hide_top_toolbar": false,
+                "save_image": false,
+                "backgroundColor": isDark ? "#0a0a0a" : "#ffffff",
+                "gridColor": isDark ? "#1a1a1a" : "#e5e5e5",
+                "hide_legend": false,
+                "withdateranges": true,
+                "range": "1D",
+                "details": true,
+                "hotlist": false,
+                "calendar": false,
+                "show_popup_button": false,
+                "drawings_access": {
+                    "type": "black",
+                    "tools": [{
+                        "name": "Horizontal Line",
+                        "grayed": false
+                    }]
+                },
+                "overrides": {
+                    "paneProperties.background": isDark ? "#0a0a0a" : "#ffffff",
+                    "paneProperties.backgroundType": "solid"
+                }
+            });
+        }
+    </script>
+</body>
+</html>
