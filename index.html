@@ -371,6 +371,15 @@
             font-size: 0.95em;
         }
 
+        .card-timestamp {
+            font-size: 0.7em;
+            color: var(--text-tertiary);
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            text-align: right;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -443,6 +452,7 @@
                     <span class="metric-label">24h Volume</span>
                     <span class="metric-value" id="volume24h">—</span>
                 </div>
+                <div class="card-timestamp" id="tsPrice">—</div>
             </div>
 
             <div class="card">
@@ -467,6 +477,7 @@
                     <span class="metric-label">Lower Band (1σ)</span>
                     <span class="metric-value" id="vwapLower">—</span>
                 </div>
+                <div class="card-timestamp" id="tsVwap">—</div>
             </div>
 
             <div class="card">
@@ -491,6 +502,7 @@
                     <span class="metric-label">Pressure</span>
                     <span class="metric-value" id="obPressure">—</span>
                 </div>
+                <div class="card-timestamp" id="tsOrderBook">—</div>
             </div>
 
             <div class="card">
@@ -515,6 +527,7 @@
                     <span class="metric-label">OI Change 24h</span>
                     <span class="metric-value" id="oiChange">—</span>
                 </div>
+                <div class="card-timestamp" id="tsFutures">—</div>
             </div>
 
             <div class="card">
@@ -539,6 +552,7 @@
                     <span class="metric-label">Price Gap</span>
                     <span class="metric-value" id="sfPriceGap">—</span>
                 </div>
+                <div class="card-timestamp" id="tsSpotFutures">—</div>
             </div>
 
             <div class="card">
@@ -563,6 +577,7 @@
                     <span class="metric-label">Divergences</span>
                     <span class="metric-value" id="poiDivergence">—</span>
                 </div>
+                <div class="card-timestamp" id="tsPriceOI">—</div>
             </div>
         </div>
 
@@ -739,6 +754,25 @@
             return '$' + num.toFixed(0);
         }
 
+        // Format timestamp for cards
+        function formatTimestamp() {
+            const now = new Date();
+            return now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        // Update timestamp for a specific element
+        function updateTimestamp(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = 'Updated: ' + formatTimestamp();
+            }
+        }
+
         function toggleTheme() {
             const html = document.documentElement;
             const button = document.querySelector('.theme-toggle');
@@ -771,6 +805,7 @@
                 marketData.spotVolume = parseFloat(data.quoteVolume);
 
                 updatePriceDisplay();
+                updateTimestamp('tsPrice');
             } catch (error) {
                 console.error('Failed to fetch spot ticker:', error);
             }
@@ -801,6 +836,7 @@
                 marketData.spread = bestAsk - bestBid;
 
                 updateOrderBookDisplay();
+                updateTimestamp('tsOrderBook');
             } catch (error) {
                 console.error('Failed to fetch order book:', error);
             }
@@ -817,6 +853,7 @@
                 }
 
                 updateFuturesDisplay();
+                updateTimestamp('tsFutures');
             } catch (error) {
                 console.error('Failed to fetch funding rate:', error);
             }
@@ -845,6 +882,7 @@
                 marketData.futuresVolume = parseFloat(data.quoteVolume);
 
                 updateSpotFuturesDisplay();
+                updateTimestamp('tsSpotFutures');
             } catch (error) {
                 console.error('Failed to fetch futures ticker:', error);
             }
@@ -861,6 +899,7 @@
                 }
 
                 updatePriceOIDisplay();
+                updateTimestamp('tsPriceOI');
             } catch (error) {
                 console.error('Failed to fetch long/short ratio:', error);
             }
@@ -907,6 +946,7 @@
                 marketData.vwapLower = vwap - stdDev;
 
                 updateVWAPDisplay();
+                updateTimestamp('tsVwap');
             } catch (error) {
                 console.error('Failed to calculate VWAP:', error);
             }
