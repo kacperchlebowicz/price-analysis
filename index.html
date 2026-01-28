@@ -380,6 +380,38 @@
             text-align: right;
         }
 
+        .nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            margin: -40px -20px 40px -20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -415,6 +447,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="index.html" class="nav-link active">Bitcoin Analysis</a>
+            <a href="metals-crypto-tracker.html" class="nav-link">Metals → Crypto Flow</a>
+        </nav>
+
         <!-- Header -->
         <div class="header">
             <div class="header-content">

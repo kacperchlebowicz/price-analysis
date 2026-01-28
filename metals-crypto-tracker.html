@@ -99,6 +99,37 @@
             background: var(--border);
         }
 
+        .nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            border-color: var(--border);
+            font-weight: 500;
+        }
+
         .last-update {
             color: var(--text-tertiary);
             font-size: 12px;
@@ -626,6 +657,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="index.html" class="nav-link">Bitcoin Analysis</a>
+            <a href="metals-crypto-tracker.html" class="nav-link active">Metals → Crypto Flow</a>
+        </nav>
+
         <!-- Header -->
         <header class="header">
             <div>
