@@ -757,28 +757,74 @@
             }
         }
 
-        // Fetch metals prices using tokenized gold (PAXG) as proxy
+        // Fetch metals prices from multiple sources
         async function fetchMetalsPrices() {
+            let goldFetched = false;
+            let silverFetched = false;
+
+            // Try primary source: Free forex API for XAU and XAG
             try {
-                // Use PAXG (Pax Gold) from Binance as gold proxy - it's backed 1:1 by gold
-                const paxgRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
-                const paxg = await paxgRes.json();
-
-                marketData.gold.price = parseFloat(paxg.lastPrice) || 2650;
-                marketData.gold.change24h = parseFloat(paxg.priceChangePercent) || 0;
-
-            } catch (error) {
-                console.error('Failed to fetch metals:', error);
-                // Fallback values
-                marketData.gold.price = 2650;
-                marketData.gold.change24h = 0;
+                const response = await fetch('https://api.frankfurter.app/latest?from=XAU&to=USD');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.rates && data.rates.USD) {
+                        // XAU is quoted as USD per troy ounce
+                        marketData.gold.price = data.rates.USD;
+                        goldFetched = true;
+                    }
+                }
+            } catch (e) {
+                console.log('Frankfurter API not available for gold');
             }
 
-            // Calculate silver from gold/silver ratio (typically ~80-85:1)
-            const goldSilverRatio = 82;
-            marketData.silver.price = marketData.gold.price / goldSilverRatio;
-            // Silver is typically 1.2-1.5x more volatile than gold
-            marketData.silver.change24h = marketData.gold.change24h * 1.3;
+            // Fallback: Use PAXG from Binance for gold
+            if (!goldFetched) {
+                try {
+                    const paxgRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
+                    const paxg = await paxgRes.json();
+                    marketData.gold.price = parseFloat(paxg.lastPrice) || 2800;
+                    marketData.gold.change24h = parseFloat(paxg.priceChangePercent) || 0;
+                    goldFetched = true;
+                } catch (e) {
+                    console.log('PAXG fallback failed');
+                    marketData.gold.price = 2800;
+                    marketData.gold.change24h = 0;
+                }
+            }
+
+            // Try to get silver from free metals API
+            try {
+                // Using a public CORS-friendly metals endpoint
+                const silverRes = await fetch('https://data-asg.goldprice.org/dbXRates/USD');
+                if (silverRes.ok) {
+                    const silverData = await silverRes.json();
+                    if (silverData.items && silverData.items[0]) {
+                        const item = silverData.items[0];
+                        // goldprice.org returns xauPrice and xagPrice
+                        if (item.xagPrice) {
+                            marketData.silver.price = item.xagPrice;
+                            marketData.silver.change24h = item.pcXag || 0;
+                            silverFetched = true;
+                        }
+                        // Also update gold if available and more accurate
+                        if (item.xauPrice && !goldFetched) {
+                            marketData.gold.price = item.xauPrice;
+                            marketData.gold.change24h = item.pcXau || 0;
+                            goldFetched = true;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('GoldPrice API not available');
+            }
+
+            // Final fallback for silver: use current market estimate
+            if (!silverFetched) {
+                // Current gold/silver ratio is around 30:1 (as of 2026)
+                const goldSilverRatio = 30;
+                marketData.silver.price = marketData.gold.price / goldSilverRatio;
+                marketData.silver.change24h = marketData.gold.change24h * 1.3;
+            }
 
             updateMetalsUI();
             updateTimestamp('tsGold');
