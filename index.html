@@ -617,6 +617,31 @@
                 </div>
                 <div class="card-timestamp" id="tsPriceOI">—</div>
             </div>
+
+            <div class="card">
+                <div class="card-title">Liquidation Clusters</div>
+                <div class="metric-row">
+                    <span class="metric-label">Nearest Above</span>
+                    <span class="metric-value" id="liqAbove1">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Major Above</span>
+                    <span class="metric-value" id="liqAbove2">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Nearest Below</span>
+                    <span class="metric-value" id="liqBelow1">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Major Below</span>
+                    <span class="metric-value" id="liqBelow2">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Risk Zone</span>
+                    <span class="metric-value" id="liqRiskZone">—</span>
+                </div>
+                <div class="card-timestamp" id="tsLiquidation">—</div>
+            </div>
         </div>
 
         <!-- Price Chart -->
@@ -940,6 +965,183 @@
                 updateTimestamp('tsPriceOI');
             } catch (error) {
                 console.error('Failed to fetch long/short ratio:', error);
+            }
+        }
+
+        // Estimate liquidation clusters based on recent price action and common leverage
+        function estimateLiquidationClusters() {
+            const price = marketData.currentPrice;
+            const high24h = marketData.high24h;
+            const low24h = marketData.low24h;
+            const vwap = marketData.vwap;
+
+            if (!price || price === 0) return;
+
+            // Maintenance margin rate for BTC on Binance (approx 0.4-0.5%)
+            const maintenanceMargin = 0.004;
+
+            // Common leverage levels and their liquidation distances
+            // For longs: liq_price = entry * (1 - 1/leverage + mm)
+            // For shorts: liq_price = entry * (1 + 1/leverage - mm)
+            const leverageLevels = [
+                { leverage: 10, weight: 0.15 },   // 10x - ~10% move to liq
+                { leverage: 25, weight: 0.30 },   // 25x - ~4% move to liq
+                { leverage: 50, weight: 0.35 },   // 50x - ~2% move to liq
+                { leverage: 100, weight: 0.20 }   // 100x - ~1% move to liq
+            ];
+
+            // Key entry price zones where positions were likely opened
+            const entryZones = {
+                longs: [
+                    { price: low24h, weight: 0.35, label: '24h Low' },
+                    { price: vwap * 0.99, weight: 0.25, label: 'Below VWAP' },
+                    { price: price * 0.98, weight: 0.25, label: 'Recent Dip' },
+                    { price: marketData.monthlyOpen, weight: 0.15, label: 'Monthly Open' }
+                ],
+                shorts: [
+                    { price: high24h, weight: 0.35, label: '24h High' },
+                    { price: vwap * 1.01, weight: 0.25, label: 'Above VWAP' },
+                    { price: price * 1.02, weight: 0.25, label: 'Recent Pump' },
+                    { price: marketData.weeklyOpen * 1.02, weight: 0.15, label: 'Weekly Resistance' }
+                ]
+            };
+
+            // Calculate liquidation levels for longs (below current price)
+            let liqLevelsBelow = [];
+            entryZones.longs.forEach(entry => {
+                if (entry.price > 0) {
+                    leverageLevels.forEach(lev => {
+                        const liqPrice = entry.price * (1 - 1/lev.leverage + maintenanceMargin);
+                        if (liqPrice < price && liqPrice > price * 0.85) { // Within reasonable range
+                            liqLevelsBelow.push({
+                                price: liqPrice,
+                                weight: entry.weight * lev.weight,
+                                leverage: lev.leverage,
+                                entry: entry.label
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Calculate liquidation levels for shorts (above current price)
+            let liqLevelsAbove = [];
+            entryZones.shorts.forEach(entry => {
+                if (entry.price > 0) {
+                    leverageLevels.forEach(lev => {
+                        const liqPrice = entry.price * (1 + 1/lev.leverage - maintenanceMargin);
+                        if (liqPrice > price && liqPrice < price * 1.15) { // Within reasonable range
+                            liqLevelsAbove.push({
+                                price: liqPrice,
+                                weight: entry.weight * lev.weight,
+                                leverage: lev.leverage,
+                                entry: entry.label
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Sort and find clusters
+            liqLevelsBelow.sort((a, b) => b.price - a.price); // Nearest first
+            liqLevelsAbove.sort((a, b) => a.price - b.price); // Nearest first
+
+            // Group nearby levels into clusters (within 0.5%)
+            function clusterLevels(levels) {
+                if (levels.length === 0) return [];
+                const clusters = [];
+                let currentCluster = { price: levels[0].price, weight: levels[0].weight, count: 1 };
+
+                for (let i = 1; i < levels.length; i++) {
+                    if (Math.abs(levels[i].price - currentCluster.price) / currentCluster.price < 0.005) {
+                        currentCluster.weight += levels[i].weight;
+                        currentCluster.count++;
+                        currentCluster.price = (currentCluster.price + levels[i].price) / 2;
+                    } else {
+                        clusters.push(currentCluster);
+                        currentCluster = { price: levels[i].price, weight: levels[i].weight, count: 1 };
+                    }
+                }
+                clusters.push(currentCluster);
+                return clusters.sort((a, b) => b.weight - a.weight); // Sort by importance
+            }
+
+            const clustersBelow = clusterLevels(liqLevelsBelow);
+            const clustersAbove = clusterLevels(liqLevelsAbove);
+
+            // Store in marketData
+            marketData.liqClusters = {
+                above: clustersAbove.slice(0, 3),
+                below: clustersBelow.slice(0, 3)
+            };
+
+            updateLiquidationDisplay();
+            updateTimestamp('tsLiquidation');
+        }
+
+        // Update liquidation display
+        function updateLiquidationDisplay() {
+            const clusters = marketData.liqClusters;
+            if (!clusters) return;
+
+            const price = marketData.currentPrice;
+
+            // Above current price (short squeezes)
+            if (clusters.above.length > 0) {
+                const nearest = clusters.above[0];
+                const distNearest = ((nearest.price - price) / price * 100).toFixed(2);
+                document.getElementById('liqAbove1').innerHTML =
+                    `<span class="negative">${formatPrice(nearest.price, 0)}</span> <small>(+${distNearest}%)</small>`;
+
+                if (clusters.above.length > 1) {
+                    const major = clusters.above[1];
+                    const distMajor = ((major.price - price) / price * 100).toFixed(2);
+                    document.getElementById('liqAbove2').innerHTML =
+                        `<span class="negative">${formatPrice(major.price, 0)}</span> <small>(+${distMajor}%)</small>`;
+                } else {
+                    document.getElementById('liqAbove2').textContent = '—';
+                }
+            } else {
+                document.getElementById('liqAbove1').textContent = 'No cluster detected';
+                document.getElementById('liqAbove2').textContent = '—';
+            }
+
+            // Below current price (long liquidations)
+            if (clusters.below.length > 0) {
+                const nearest = clusters.below[0];
+                const distNearest = ((price - nearest.price) / price * 100).toFixed(2);
+                document.getElementById('liqBelow1').innerHTML =
+                    `<span class="positive">${formatPrice(nearest.price, 0)}</span> <small>(-${distNearest}%)</small>`;
+
+                if (clusters.below.length > 1) {
+                    const major = clusters.below[1];
+                    const distMajor = ((price - major.price) / price * 100).toFixed(2);
+                    document.getElementById('liqBelow2').innerHTML =
+                        `<span class="positive">${formatPrice(major.price, 0)}</span> <small>(-${distMajor}%)</small>`;
+                } else {
+                    document.getElementById('liqBelow2').textContent = '—';
+                }
+            } else {
+                document.getElementById('liqBelow1').textContent = 'No cluster detected';
+                document.getElementById('liqBelow2').textContent = '—';
+            }
+
+            // Determine risk zone
+            const riskEl = document.getElementById('liqRiskZone');
+            const nearestAbove = clusters.above.length > 0 ?
+                ((clusters.above[0].price - price) / price * 100) : 100;
+            const nearestBelow = clusters.below.length > 0 ?
+                ((price - clusters.below[0].price) / price * 100) : 100;
+
+            if (nearestAbove < 2 || nearestBelow < 2) {
+                riskEl.textContent = 'High - Near Liquidations';
+                riskEl.className = 'metric-value negative';
+            } else if (nearestAbove < 4 || nearestBelow < 4) {
+                riskEl.textContent = 'Medium - Watch Closely';
+                riskEl.className = 'metric-value neutral';
+            } else {
+                riskEl.textContent = 'Low - Clear Range';
+                riskEl.className = 'metric-value positive';
             }
         }
 
@@ -1480,6 +1682,9 @@
                 fetchVWAP(),
                 fetchKeyLevels()
             ]);
+
+            // Estimate liquidation clusters after all data is loaded
+            estimateLiquidationClusters();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
