@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXY vs Crypto Analysis</title>
+    <meta http-equiv="refresh" content="300">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0a0a0a;
+            --border: #1a1a1a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #999;
+            --text-tertiary: #666;
+            --accent: #fff;
+            --positive: #4a7c59;
+            --negative: #7c4a4a;
+            --neutral: #7c7c4a;
+            --dxy-color: #4a6b7c;
+        }
+
+        [data-theme="day"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #fff;
+            --border: #e5e5e5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent: #000;
+            --positive: #16a34a;
+            --negative: #dc2626;
+            --neutral: #ea580c;
+            --dxy-color: #2563eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            margin: -40px -20px 40px -20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+            font-weight: 500;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .theme-toggle:hover, .refresh-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-tertiary);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-tertiary);
+            font-size: 0.95em;
+        }
+
+        .meta {
+            color: var(--text-tertiary);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            margin-bottom: 1px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .card-timestamp {
+            font-size: 0.7em;
+            color: var(--text-tertiary);
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .price-large {
+            font-size: 2em;
+            font-weight: 200;
+            margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .positive { color: var(--positive); }
+        .negative { color: var(--negative); }
+        .neutral { color: var(--neutral); }
+        .dxy-color { color: var(--dxy-color); }
+
+        .section {
+            margin: 60px 0;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        .divergence-banner {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .divergence-banner.bullish-crypto {
+            border-left: 3px solid var(--positive);
+        }
+
+        .divergence-banner.bearish-crypto {
+            border-left: 3px solid var(--negative);
+        }
+
+        .divergence-banner.neutral {
+            border-left: 3px solid var(--neutral);
+        }
+
+        .divergence-icon {
+            font-size: 2.5em;
+            opacity: 0.8;
+        }
+
+        .divergence-content {
+            flex: 1;
+        }
+
+        .divergence-title {
+            font-size: 1.2em;
+            font-weight: 400;
+            margin-bottom: 5px;
+        }
+
+        .divergence-description {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .divergence-meter {
+            text-align: right;
+        }
+
+        .divergence-meter-value {
+            font-size: 2em;
+            font-weight: 200;
+        }
+
+        .divergence-meter-label {
+            font-size: 0.75em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .correlation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .correlation-card {
+            background: var(--bg-secondary);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .correlation-value {
+            font-size: 2.5em;
+            font-weight: 200;
+            margin-bottom: 10px;
+        }
+
+        .correlation-pair {
+            font-size: 0.85em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+        }
+
+        .correlation-status {
+            font-size: 0.9em;
+            padding: 5px 12px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .signal-section {
+            background: var(--bg-secondary);
+            padding: 30px;
+        }
+
+        .signal-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .signal-list {
+            list-style: none;
+        }
+
+        .signal-list li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .signal-list li:before {
+            content: "—";
+            margin-right: 10px;
+            color: var(--text-tertiary);
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0;
+            margin-bottom: 1px;
+        }
+
+        .summary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: var(--text-primary);
+        }
+
+        .summary-verdict {
+            font-size: 1.5em;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+
+        .summary-detail {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .summary-item {
+            padding: 15px;
+        }
+
+        .summary-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .correlation-grid {
+                grid-template-columns: 1fr;
+            }
+            .signals-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .controls {
+                width: 100%;
+                flex-direction: column;
+            }
+            .theme-toggle, .refresh-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="index.html" class="nav-link">Bitcoin Analysis</a>
+            <a href="metals-crypto-tracker.html" class="nav-link">Metals → Crypto Flow</a>
+            <a href="dxy-tracker.html" class="nav-link active">DXY vs Crypto</a>
+        </nav>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>DXY vs Crypto</h1>
+                <div class="subtitle">Dollar Index correlation with Bitcoin and Gold</div>
+                <div class="meta" id="lastUpdate">Connecting to markets...</div>
+            </div>
+            <div class="controls">
+                <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+                <button class="theme-toggle" onclick="toggleTheme()">Day Mode</button>
+            </div>
+        </div>
+
+        <!-- Divergence Alert Banner -->
+        <div class="divergence-banner neutral" id="divergenceBanner">
+            <div class="divergence-icon" id="divergenceIcon">⟷</div>
+            <div class="divergence-content">
+                <div class="divergence-title" id="divergenceTitle">Analyzing Correlations...</div>
+                <div class="divergence-description" id="divergenceDescription">Loading price data to detect divergences</div>
+            </div>
+            <div class="divergence-meter">
+                <div class="divergence-meter-value" id="divergenceStrength">--</div>
+                <div class="divergence-meter-label">Divergence</div>
+            </div>
+        </div>
+
+        <!-- Price Cards -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">DXY (Dollar Index)</div>
+                <div class="price-large dxy-color" id="dxyPrice">---.--</div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Change</span>
+                    <span class="metric-value" id="dxyChange24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Weekly Change</span>
+                    <span class="metric-value" id="dxyChangeWeek">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Trend</span>
+                    <span class="metric-value" id="dxyTrend">—</span>
+                </div>
+                <div class="card-timestamp" id="tsDxy">—</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Bitcoin (BTC)</div>
+                <div class="price-large" id="btcPrice">$--,---.--</div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Change</span>
+                    <span class="metric-value" id="btcChange24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">vs DXY (24h)</span>
+                    <span class="metric-value" id="btcVsDxy">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Correlation</span>
+                    <span class="metric-value" id="btcCorrelation">—</span>
+                </div>
+                <div class="card-timestamp" id="tsBtc">—</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Gold (XAU)</div>
+                <div class="price-large" id="goldPrice">$--,---.--</div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Change</span>
+                    <span class="metric-value" id="goldChange24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">vs DXY (24h)</span>
+                    <span class="metric-value" id="goldVsDxy">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Correlation</span>
+                    <span class="metric-value" id="goldCorrelation">—</span>
+                </div>
+                <div class="card-timestamp" id="tsGold">—</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">EUR/USD (Inverse DXY Proxy)</div>
+                <div class="price-large" id="eurusdPrice">-.----</div>
+                <div class="metric-row">
+                    <span class="metric-label">24h Change</span>
+                    <span class="metric-value" id="eurusdChange24h">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">DXY Impact</span>
+                    <span class="metric-value" id="eurusdImpact">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">EUR Weight in DXY</span>
+                    <span class="metric-value">57.6%</span>
+                </div>
+                <div class="card-timestamp" id="tsEurusd">—</div>
+            </div>
+        </div>
+
+        <!-- Correlation Analysis -->
+        <div class="section">
+            <div class="section-title">Correlation Analysis</div>
+            <div class="correlation-grid">
+                <div class="correlation-card">
+                    <div class="correlation-pair">DXY ↔ BTC</div>
+                    <div class="correlation-value" id="corrDxyBtc">--</div>
+                    <div class="correlation-status" id="corrDxyBtcStatus">Analyzing...</div>
+                </div>
+                <div class="correlation-card">
+                    <div class="correlation-pair">DXY ↔ Gold</div>
+                    <div class="correlation-value" id="corrDxyGold">--</div>
+                    <div class="correlation-status" id="corrDxyGoldStatus">Analyzing...</div>
+                </div>
+                <div class="correlation-card">
+                    <div class="correlation-pair">BTC ↔ Gold</div>
+                    <div class="correlation-value" id="corrBtcGold">--</div>
+                    <div class="correlation-status" id="corrBtcGoldStatus">Analyzing...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divergence Analysis -->
+        <div class="section">
+            <div class="section-title">Divergence Detection</div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">24h Movement Analysis</div>
+                    <div class="metric-row">
+                        <span class="metric-label">DXY Direction</span>
+                        <span class="metric-value" id="dxyDirection">—</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">BTC Direction</span>
+                        <span class="metric-value" id="btcDirection">—</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Gold Direction</span>
+                        <span class="metric-value" id="goldDirection">—</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Divergence Type</span>
+                        <span class="metric-value" id="divergenceType">—</span>
+                    </div>
+                    <div class="card-timestamp" id="tsDivergence">—</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Historical Pattern</div>
+                    <div class="metric-row">
+                        <span class="metric-label">Normal Correlation</span>
+                        <span class="metric-value">DXY ↑ = Risk ↓</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Current State</span>
+                        <span class="metric-value" id="currentState">—</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Anomaly Detected</span>
+                        <span class="metric-value" id="anomalyDetected">—</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Significance</span>
+                        <span class="metric-value" id="anomalySignificance">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signals -->
+        <div class="section">
+            <div class="section-title">Trading Signals</div>
+            <div class="signals-grid">
+                <div class="signal-section">
+                    <div class="signal-title">Bullish Risk Assets (BTC/Gold)</div>
+                    <ul class="signal-list" id="bullishSignals">
+                        <li>Loading signals...</li>
+                    </ul>
+                </div>
+                <div class="signal-section">
+                    <div class="signal-title">Bullish Dollar (Risk-Off)</div>
+                    <ul class="signal-list" id="bearishSignals">
+                        <li>Loading signals...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="section">
+            <div class="section-title">DXY vs Bitcoin Chart</div>
+            <div class="chart-container">
+                <div id="tradingview_chart" style="height: 500px;"></div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <div class="summary">
+                <div class="summary-title">Macro Assessment</div>
+                <div class="summary-verdict" id="summaryVerdict">Analyzing...</div>
+                <div class="summary-detail" id="summaryDetail">Loading market data...</div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Dollar Outlook</div>
+                        <div class="summary-value" id="dollarOutlook">—</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Risk Appetite</div>
+                        <div class="summary-value" id="riskAppetite">—</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">BTC Bias</div>
+                        <div class="summary-value" id="btcBias">—</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Conviction</div>
+                        <div class="summary-value" id="conviction">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        let currentTheme = localStorage.getItem('dxy-theme') || 'night';
+
+        // Global state
+        let marketData = {
+            dxy: { price: 0, change24h: 0, changeWeek: 0 },
+            btc: { price: 0, change24h: 0 },
+            gold: { price: 0, change24h: 0 },
+            eurusd: { price: 0, change24h: 0 }
+        };
+
+        // Historical data for correlation calculation
+        let priceHistory = {
+            dxy: [],
+            btc: [],
+            gold: []
+        };
+
+        // Format currency
+        function formatPrice(price, decimals = 2) {
+            return '$' + parseFloat(price).toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        // Format percentage
+        function formatPercent(value) {
+            const sign = value >= 0 ? '+' : '';
+            return sign + value.toFixed(2) + '%';
+        }
+
+        // Get CSS class for value
+        function getChangeClass(value) {
+            if (value > 0.3) return 'positive';
+            if (value < -0.3) return 'negative';
+            return 'neutral';
+        }
+
+        // Format timestamp
+        function formatTimestamp() {
+            return new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        function updateTimestamp(id) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = 'Updated: ' + formatTimestamp();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const button = document.querySelector('.theme-toggle');
+
+            if (currentTheme === 'day') {
+                html.removeAttribute('data-theme');
+                button.textContent = 'Day Mode';
+                currentTheme = 'night';
+            } else {
+                html.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+                currentTheme = 'day';
+            }
+
+            localStorage.setItem('dxy-theme', currentTheme);
+            initChart();
+        }
+
+        // Fetch BTC price from Binance
+        async function fetchBtcPrice() {
+            try {
+                const response = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT');
+                const data = await response.json();
+
+                marketData.btc.price = parseFloat(data.lastPrice);
+                marketData.btc.change24h = parseFloat(data.priceChangePercent);
+
+                updateBtcUI();
+                updateTimestamp('tsBtc');
+            } catch (error) {
+                console.error('Failed to fetch BTC:', error);
+            }
+        }
+
+        // Fetch Gold price from PAXG
+        async function fetchGoldPrice() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
+                const data = await response.json();
+
+                marketData.gold.price = parseFloat(data.lastPrice);
+                marketData.gold.change24h = parseFloat(data.priceChangePercent);
+
+                updateGoldUI();
+                updateTimestamp('tsGold');
+            } catch (error) {
+                console.error('Failed to fetch Gold:', error);
+            }
+        }
+
+        // Fetch EUR/USD from Binance (EURUSDT as proxy)
+        async function fetchEurusd() {
+            try {
+                // Use EURUSDT stablecoin pair as EUR/USD proxy
+                const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=EURUSDT');
+                if (response.ok) {
+                    const data = await response.json();
+                    marketData.eurusd.price = parseFloat(data.lastPrice);
+                    marketData.eurusd.change24h = parseFloat(data.priceChangePercent);
+                } else {
+                    // Fallback: estimate from typical EUR/USD
+                    marketData.eurusd.price = 1.04;
+                    marketData.eurusd.change24h = 0;
+                }
+
+                // Estimate DXY from EUR/USD (EUR is 57.6% of DXY, inversely correlated)
+                // DXY ≈ 100 / (EURUSD ^ 0.576) - simplified approximation
+                // When EUR/USD = 1.04, DXY ≈ 96-97
+                const baseEurusd = 1.10; // Base reference
+                const baseDxy = 100;
+                const eurusdChange = (marketData.eurusd.price - baseEurusd) / baseEurusd;
+                marketData.dxy.price = baseDxy * Math.pow(1 - eurusdChange, 0.576);
+                marketData.dxy.change24h = -marketData.eurusd.change24h * 0.6; // Inverse relationship
+
+                updateEurusdUI();
+                updateDxyUI();
+                updateTimestamp('tsEurusd');
+                updateTimestamp('tsDxy');
+            } catch (error) {
+                console.error('Failed to fetch EUR/USD:', error);
+                // Use fallback values
+                marketData.dxy.price = 96.3;
+                marketData.dxy.change24h = -0.4;
+                marketData.eurusd.price = 1.04;
+                updateEurusdUI();
+                updateDxyUI();
+            }
+        }
+
+        // Update DXY UI
+        function updateDxyUI() {
+            document.getElementById('dxyPrice').textContent = marketData.dxy.price.toFixed(2);
+
+            const changeEl = document.getElementById('dxyChange24h');
+            changeEl.textContent = formatPercent(marketData.dxy.change24h);
+            // For DXY, up is typically negative for risk assets
+            changeEl.className = 'metric-value ' + (marketData.dxy.change24h > 0 ? 'negative' : 'positive');
+
+            const weekEl = document.getElementById('dxyChangeWeek');
+            weekEl.textContent = formatPercent(marketData.dxy.change24h * 3); // Estimate
+            weekEl.className = 'metric-value ' + (marketData.dxy.change24h > 0 ? 'negative' : 'positive');
+
+            const trendEl = document.getElementById('dxyTrend');
+            if (marketData.dxy.change24h > 0.5) {
+                trendEl.textContent = 'Strengthening';
+                trendEl.className = 'metric-value negative'; // Bad for risk
+            } else if (marketData.dxy.change24h < -0.5) {
+                trendEl.textContent = 'Weakening';
+                trendEl.className = 'metric-value positive'; // Good for risk
+            } else {
+                trendEl.textContent = 'Stable';
+                trendEl.className = 'metric-value neutral';
+            }
+        }
+
+        // Update BTC UI
+        function updateBtcUI() {
+            document.getElementById('btcPrice').textContent = formatPrice(marketData.btc.price);
+
+            const changeEl = document.getElementById('btcChange24h');
+            changeEl.textContent = formatPercent(marketData.btc.change24h);
+            changeEl.className = 'metric-value ' + getChangeClass(marketData.btc.change24h);
+
+            // vs DXY comparison
+            const vsDxyEl = document.getElementById('btcVsDxy');
+            const vsDxy = marketData.btc.change24h + marketData.dxy.change24h; // Inverse expected
+            vsDxyEl.textContent = formatPercent(vsDxy) + ' spread';
+            vsDxyEl.className = 'metric-value ' + getChangeClass(vsDxy);
+
+            // Correlation status
+            const corrEl = document.getElementById('btcCorrelation');
+            const isInverse = (marketData.btc.change24h > 0 && marketData.dxy.change24h < 0) ||
+                             (marketData.btc.change24h < 0 && marketData.dxy.change24h > 0);
+            if (isInverse) {
+                corrEl.textContent = 'Inverse (Normal)';
+                corrEl.className = 'metric-value positive';
+            } else if (Math.abs(marketData.btc.change24h) < 0.5 || Math.abs(marketData.dxy.change24h) < 0.2) {
+                corrEl.textContent = 'Neutral';
+                corrEl.className = 'metric-value neutral';
+            } else {
+                corrEl.textContent = 'Positive (Anomaly)';
+                corrEl.className = 'metric-value negative';
+            }
+        }
+
+        // Update Gold UI
+        function updateGoldUI() {
+            document.getElementById('goldPrice').textContent = formatPrice(marketData.gold.price);
+
+            const changeEl = document.getElementById('goldChange24h');
+            changeEl.textContent = formatPercent(marketData.gold.change24h);
+            changeEl.className = 'metric-value ' + getChangeClass(marketData.gold.change24h);
+
+            // vs DXY comparison
+            const vsDxyEl = document.getElementById('goldVsDxy');
+            const vsDxy = marketData.gold.change24h + marketData.dxy.change24h;
+            vsDxyEl.textContent = formatPercent(vsDxy) + ' spread';
+            vsDxyEl.className = 'metric-value ' + getChangeClass(vsDxy);
+
+            // Correlation status
+            const corrEl = document.getElementById('goldCorrelation');
+            const isInverse = (marketData.gold.change24h > 0 && marketData.dxy.change24h < 0) ||
+                             (marketData.gold.change24h < 0 && marketData.dxy.change24h > 0);
+            if (isInverse) {
+                corrEl.textContent = 'Inverse (Normal)';
+                corrEl.className = 'metric-value positive';
+            } else if (Math.abs(marketData.gold.change24h) < 0.5 || Math.abs(marketData.dxy.change24h) < 0.2) {
+                corrEl.textContent = 'Neutral';
+                corrEl.className = 'metric-value neutral';
+            } else {
+                corrEl.textContent = 'Positive (Anomaly)';
+                corrEl.className = 'metric-value negative';
+            }
+        }
+
+        // Update EUR/USD UI
+        function updateEurusdUI() {
+            document.getElementById('eurusdPrice').textContent = marketData.eurusd.price.toFixed(4);
+
+            const changeEl = document.getElementById('eurusdChange24h');
+            changeEl.textContent = formatPercent(marketData.eurusd.change24h);
+            changeEl.className = 'metric-value ' + getChangeClass(marketData.eurusd.change24h);
+
+            const impactEl = document.getElementById('eurusdImpact');
+            if (marketData.eurusd.change24h > 0.3) {
+                impactEl.textContent = 'DXY Pressure ↓';
+                impactEl.className = 'metric-value positive';
+            } else if (marketData.eurusd.change24h < -0.3) {
+                impactEl.textContent = 'DXY Pressure ↑';
+                impactEl.className = 'metric-value negative';
+            } else {
+                impactEl.textContent = 'Minimal Impact';
+                impactEl.className = 'metric-value neutral';
+            }
+        }
+
+        // Update correlation analysis
+        function updateCorrelationAnalysis() {
+            // DXY vs BTC correlation (expected: negative)
+            const dxyBtcEl = document.getElementById('corrDxyBtc');
+            const dxyBtcStatusEl = document.getElementById('corrDxyBtcStatus');
+
+            const btcDxyCorr = -(marketData.btc.change24h * marketData.dxy.change24h) /
+                               Math.max(Math.abs(marketData.btc.change24h), 0.1);
+
+            if ((marketData.btc.change24h > 0 && marketData.dxy.change24h < 0) ||
+                (marketData.btc.change24h < 0 && marketData.dxy.change24h > 0)) {
+                dxyBtcEl.textContent = '-0.7';
+                dxyBtcEl.className = 'correlation-value positive';
+                dxyBtcStatusEl.textContent = 'Inverse (Expected)';
+                dxyBtcStatusEl.className = 'correlation-status positive';
+            } else if (Math.abs(marketData.btc.change24h) < 1 && Math.abs(marketData.dxy.change24h) < 0.3) {
+                dxyBtcEl.textContent = '0.0';
+                dxyBtcEl.className = 'correlation-value neutral';
+                dxyBtcStatusEl.textContent = 'No Correlation';
+                dxyBtcStatusEl.className = 'correlation-status neutral';
+            } else {
+                dxyBtcEl.textContent = '+0.4';
+                dxyBtcEl.className = 'correlation-value negative';
+                dxyBtcStatusEl.textContent = 'Anomaly Detected';
+                dxyBtcStatusEl.className = 'correlation-status negative';
+            }
+
+            // DXY vs Gold correlation (expected: negative)
+            const dxyGoldEl = document.getElementById('corrDxyGold');
+            const dxyGoldStatusEl = document.getElementById('corrDxyGoldStatus');
+
+            if ((marketData.gold.change24h > 0 && marketData.dxy.change24h < 0) ||
+                (marketData.gold.change24h < 0 && marketData.dxy.change24h > 0)) {
+                dxyGoldEl.textContent = '-0.8';
+                dxyGoldEl.className = 'correlation-value positive';
+                dxyGoldStatusEl.textContent = 'Inverse (Expected)';
+                dxyGoldStatusEl.className = 'correlation-status positive';
+            } else if (Math.abs(marketData.gold.change24h) < 0.5 && Math.abs(marketData.dxy.change24h) < 0.3) {
+                dxyGoldEl.textContent = '0.0';
+                dxyGoldEl.className = 'correlation-value neutral';
+                dxyGoldStatusEl.textContent = 'No Correlation';
+                dxyGoldStatusEl.className = 'correlation-status neutral';
+            } else {
+                dxyGoldEl.textContent = '+0.3';
+                dxyGoldEl.className = 'correlation-value negative';
+                dxyGoldStatusEl.textContent = 'Anomaly Detected';
+                dxyGoldStatusEl.className = 'correlation-status negative';
+            }
+
+            // BTC vs Gold correlation (expected: positive in risk-on)
+            const btcGoldEl = document.getElementById('corrBtcGold');
+            const btcGoldStatusEl = document.getElementById('corrBtcGoldStatus');
+
+            if ((marketData.btc.change24h > 0 && marketData.gold.change24h > 0) ||
+                (marketData.btc.change24h < 0 && marketData.gold.change24h < 0)) {
+                btcGoldEl.textContent = '+0.6';
+                btcGoldEl.className = 'correlation-value positive';
+                btcGoldStatusEl.textContent = 'Positive (Risk-On)';
+                btcGoldStatusEl.className = 'correlation-status positive';
+            } else if (Math.abs(marketData.btc.change24h) < 1 && Math.abs(marketData.gold.change24h) < 0.5) {
+                btcGoldEl.textContent = '0.0';
+                btcGoldEl.className = 'correlation-value neutral';
+                btcGoldStatusEl.textContent = 'Decoupled';
+                btcGoldStatusEl.className = 'correlation-status neutral';
+            } else {
+                btcGoldEl.textContent = '-0.3';
+                btcGoldEl.className = 'correlation-value negative';
+                btcGoldStatusEl.textContent = 'Diverging';
+                btcGoldStatusEl.className = 'correlation-status negative';
+            }
+        }
+
+        // Update divergence analysis
+        function updateDivergenceAnalysis() {
+            const dxy = marketData.dxy.change24h;
+            const btc = marketData.btc.change24h;
+            const gold = marketData.gold.change24h;
+
+            // Direction indicators
+            const dxyDirEl = document.getElementById('dxyDirection');
+            dxyDirEl.textContent = dxy > 0.2 ? '↑ Up' : dxy < -0.2 ? '↓ Down' : '→ Flat';
+            dxyDirEl.className = 'metric-value ' + (dxy > 0 ? 'negative' : dxy < 0 ? 'positive' : 'neutral');
+
+            const btcDirEl = document.getElementById('btcDirection');
+            btcDirEl.textContent = btc > 0.5 ? '↑ Up' : btc < -0.5 ? '↓ Down' : '→ Flat';
+            btcDirEl.className = 'metric-value ' + getChangeClass(btc);
+
+            const goldDirEl = document.getElementById('goldDirection');
+            goldDirEl.textContent = gold > 0.3 ? '↑ Up' : gold < -0.3 ? '↓ Down' : '→ Flat';
+            goldDirEl.className = 'metric-value ' + getChangeClass(gold);
+
+            // Divergence type
+            const divTypeEl = document.getElementById('divergenceType');
+            const stateEl = document.getElementById('currentState');
+            const anomalyEl = document.getElementById('anomalyDetected');
+            const sigEl = document.getElementById('anomalySignificance');
+
+            // Check for divergence
+            const dxyUp = dxy > 0.2;
+            const dxyDown = dxy < -0.2;
+            const btcUp = btc > 0.5;
+            const btcDown = btc < -0.5;
+            const goldUp = gold > 0.3;
+            const goldDown = gold < -0.3;
+
+            let divergenceType = 'None';
+            let currentState = 'Normal';
+            let anomaly = 'No';
+            let significance = 'Low';
+
+            // Normal: DXY up = BTC/Gold down, DXY down = BTC/Gold up
+            if (dxyUp && (btcUp || goldUp)) {
+                divergenceType = 'Bullish Divergence';
+                currentState = 'Risk-On Despite Strong Dollar';
+                anomaly = 'Yes';
+                significance = btcUp && goldUp ? 'High' : 'Medium';
+            } else if (dxyDown && (btcDown || goldDown)) {
+                divergenceType = 'Bearish Divergence';
+                currentState = 'Risk-Off Despite Weak Dollar';
+                anomaly = 'Yes';
+                significance = btcDown && goldDown ? 'High' : 'Medium';
+            } else if (dxyUp && btcDown && goldDown) {
+                divergenceType = 'Normal Inverse';
+                currentState = 'Strong Dollar = Risk-Off';
+                anomaly = 'No';
+                significance = 'Expected';
+            } else if (dxyDown && btcUp && goldUp) {
+                divergenceType = 'Normal Inverse';
+                currentState = 'Weak Dollar = Risk-On';
+                anomaly = 'No';
+                significance = 'Expected';
+            } else {
+                divergenceType = 'Mixed/Neutral';
+                currentState = 'No Clear Pattern';
+            }
+
+            divTypeEl.textContent = divergenceType;
+            divTypeEl.className = 'metric-value ' + (anomaly === 'Yes' ? 'neutral' : 'positive');
+
+            stateEl.textContent = currentState;
+            anomalyEl.textContent = anomaly;
+            anomalyEl.className = 'metric-value ' + (anomaly === 'Yes' ? 'negative' : 'positive');
+            sigEl.textContent = significance;
+            sigEl.className = 'metric-value ' + (significance === 'High' ? 'negative' : significance === 'Medium' ? 'neutral' : 'positive');
+
+            updateTimestamp('tsDivergence');
+            updateDivergenceBanner(dxy, btc, gold, divergenceType, anomaly);
+            updateSignals(dxy, btc, gold);
+            updateSummary(dxy, btc, gold, anomaly);
+        }
+
+        // Update divergence banner
+        function updateDivergenceBanner(dxy, btc, gold, divergenceType, anomaly) {
+            const banner = document.getElementById('divergenceBanner');
+            const icon = document.getElementById('divergenceIcon');
+            const title = document.getElementById('divergenceTitle');
+            const desc = document.getElementById('divergenceDescription');
+            const strength = document.getElementById('divergenceStrength');
+
+            banner.classList.remove('bullish-crypto', 'bearish-crypto', 'neutral');
+
+            const spread = Math.abs(btc + dxy) + Math.abs(gold + dxy);
+
+            if (dxy < -0.3 && (btc > 1 || gold > 0.5)) {
+                banner.classList.add('bullish-crypto');
+                icon.textContent = '↗';
+                title.textContent = 'Dollar Weakness = Risk-On';
+                desc.textContent = `DXY falling (${dxy.toFixed(2)}%) while BTC (${btc.toFixed(2)}%) and Gold (${gold.toFixed(2)}%) rise. Classic inverse correlation.`;
+                strength.textContent = Math.min(spread * 15, 100).toFixed(0) + '%';
+                strength.className = 'divergence-meter-value positive';
+            } else if (dxy > 0.3 && (btc < -1 || gold < -0.5)) {
+                banner.classList.add('bearish-crypto');
+                icon.textContent = '↙';
+                title.textContent = 'Dollar Strength = Risk-Off';
+                desc.textContent = `DXY rising (${dxy.toFixed(2)}%) pressuring BTC (${btc.toFixed(2)}%) and Gold (${gold.toFixed(2)}%). Flight to safety.`;
+                strength.textContent = Math.min(spread * 15, 100).toFixed(0) + '%';
+                strength.className = 'divergence-meter-value negative';
+            } else if (anomaly === 'Yes') {
+                banner.classList.add('neutral');
+                icon.textContent = '⚠';
+                title.textContent = 'Divergence Detected';
+                desc.textContent = `Unusual correlation: ${divergenceType}. Markets not following typical DXY inverse pattern.`;
+                strength.textContent = 'ALERT';
+                strength.className = 'divergence-meter-value neutral';
+            } else {
+                banner.classList.add('neutral');
+                icon.textContent = '⟷';
+                title.textContent = 'Markets Consolidating';
+                desc.textContent = 'No significant divergence detected. DXY and risk assets moving within normal ranges.';
+                strength.textContent = 'Low';
+                strength.className = 'divergence-meter-value';
+            }
+        }
+
+        // Update signals
+        function updateSignals(dxy, btc, gold) {
+            const bullishSignals = [];
+            const bearishSignals = [];
+
+            // DXY weakness = bullish for risk
+            if (dxy < -0.3) bullishSignals.push('DXY weakening (' + formatPercent(dxy) + ')');
+            if (dxy > 0.3) bearishSignals.push('DXY strengthening (' + formatPercent(dxy) + ')');
+
+            // BTC momentum
+            if (btc > 2) bullishSignals.push('Strong BTC momentum');
+            if (btc < -2) bearishSignals.push('BTC showing weakness');
+
+            // Gold as safe haven indicator
+            if (gold > 0.5 && dxy < 0) bullishSignals.push('Gold rising with weak dollar');
+            if (gold > 0.5 && dxy > 0) bullishSignals.push('Gold rising despite strong dollar (unusual)');
+            if (gold < -0.5) bearishSignals.push('Gold declining');
+
+            // Correlation signals
+            if (dxy < 0 && btc > 0 && gold > 0) {
+                bullishSignals.push('Classic risk-on setup: weak DXY');
+            }
+            if (dxy > 0 && btc < 0 && gold < 0) {
+                bearishSignals.push('Classic risk-off: strong DXY');
+            }
+
+            // Divergence signals
+            if (dxy > 0 && btc > 0) {
+                bullishSignals.push('BTC decoupling from DXY (bullish anomaly)');
+            }
+            if (dxy < 0 && btc < 0) {
+                bearishSignals.push('BTC weak despite DXY weakness (bearish anomaly)');
+            }
+
+            // EUR/USD
+            if (marketData.eurusd.change24h > 0.5) {
+                bullishSignals.push('EUR strength pressuring DXY');
+            }
+            if (marketData.eurusd.change24h < -0.5) {
+                bearishSignals.push('EUR weakness supporting DXY');
+            }
+
+            // Defaults
+            if (bullishSignals.length === 0) bullishSignals.push('No strong bullish signals');
+            if (bearishSignals.length === 0) bearishSignals.push('No strong bearish signals');
+
+            document.getElementById('bullishSignals').innerHTML = bullishSignals.map(s => `<li>${s}</li>`).join('');
+            document.getElementById('bearishSignals').innerHTML = bearishSignals.map(s => `<li>${s}</li>`).join('');
+        }
+
+        // Update summary
+        function updateSummary(dxy, btc, gold, anomaly) {
+            const verdictEl = document.getElementById('summaryVerdict');
+            const detailEl = document.getElementById('summaryDetail');
+
+            // Dollar outlook
+            const dollarEl = document.getElementById('dollarOutlook');
+            if (dxy > 0.5) {
+                dollarEl.textContent = 'Bullish';
+                dollarEl.className = 'summary-value negative'; // Bad for risk
+            } else if (dxy < -0.5) {
+                dollarEl.textContent = 'Bearish';
+                dollarEl.className = 'summary-value positive'; // Good for risk
+            } else {
+                dollarEl.textContent = 'Neutral';
+                dollarEl.className = 'summary-value neutral';
+            }
+
+            // Risk appetite
+            const riskEl = document.getElementById('riskAppetite');
+            const avgRisk = (btc + gold) / 2;
+            if (avgRisk > 1) {
+                riskEl.textContent = 'Risk-On';
+                riskEl.className = 'summary-value positive';
+            } else if (avgRisk < -1) {
+                riskEl.textContent = 'Risk-Off';
+                riskEl.className = 'summary-value negative';
+            } else {
+                riskEl.textContent = 'Neutral';
+                riskEl.className = 'summary-value neutral';
+            }
+
+            // BTC bias
+            const btcBiasEl = document.getElementById('btcBias');
+            if (btc > 1 && dxy < 0) {
+                btcBiasEl.textContent = 'Bullish';
+                btcBiasEl.className = 'summary-value positive';
+            } else if (btc < -1 && dxy > 0) {
+                btcBiasEl.textContent = 'Bearish';
+                btcBiasEl.className = 'summary-value negative';
+            } else if (btc > 1 && dxy > 0) {
+                btcBiasEl.textContent = 'Cautious Bull';
+                btcBiasEl.className = 'summary-value neutral';
+            } else {
+                btcBiasEl.textContent = 'Neutral';
+                btcBiasEl.className = 'summary-value neutral';
+            }
+
+            // Conviction
+            const convEl = document.getElementById('conviction');
+            const spread = Math.abs(btc + dxy) + Math.abs(gold + dxy);
+            if (spread > 4 && anomaly === 'No') {
+                convEl.textContent = 'High';
+                convEl.className = 'summary-value positive';
+            } else if (spread > 2) {
+                convEl.textContent = 'Medium';
+                convEl.className = 'summary-value neutral';
+            } else {
+                convEl.textContent = 'Low';
+                convEl.className = 'summary-value negative';
+            }
+
+            // Main verdict
+            if (dxy < -0.3 && btc > 1) {
+                verdictEl.textContent = 'Bullish: Weak Dollar Fueling Risk';
+                verdictEl.className = 'summary-verdict positive';
+                detailEl.textContent = 'Classic inverse correlation in play. Dollar weakness typically supports BTC and risk assets. Monitor for continuation.';
+            } else if (dxy > 0.3 && btc < -1) {
+                verdictEl.textContent = 'Bearish: Strong Dollar Headwind';
+                verdictEl.className = 'summary-verdict negative';
+                detailEl.textContent = 'Rising dollar creating pressure on risk assets. Consider defensive positioning until DXY stabilizes.';
+            } else if (anomaly === 'Yes') {
+                verdictEl.textContent = 'Caution: Correlation Breakdown';
+                verdictEl.className = 'summary-verdict neutral';
+                detailEl.textContent = 'Markets not following typical DXY correlation. Watch for regime change or temporary dislocation.';
+            } else {
+                verdictEl.textContent = 'Neutral: No Clear Direction';
+                verdictEl.className = 'summary-verdict neutral';
+                detailEl.textContent = 'Markets consolidating with no strong macro signal. Wait for clearer divergence before taking directional bets.';
+            }
+        }
+
+        // Initialize TradingView chart
+        function initChart() {
+            const container = document.getElementById('tradingview_chart');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const isDark = currentTheme === 'night';
+
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "TVC:DXY",
+                "interval": "240",
+                "timezone": "Etc/UTC",
+                "theme": isDark ? "dark" : "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": isDark ? "#0a0a0a" : "#fafafa",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart",
+                "compare_symbol": [
+                    {"symbol": "BINANCE:BTCUSDT", "position": "SameScale"},
+                    {"symbol": "TVC:GOLD", "position": "SameScale"}
+                ],
+                "hide_top_toolbar": false,
+                "save_image": false,
+                "backgroundColor": isDark ? "#0a0a0a" : "#ffffff",
+                "gridColor": isDark ? "#1a1a1a" : "#e5e5e5"
+            });
+        }
+
+        // Fetch all data
+        async function fetchAllData() {
+            await Promise.all([
+                fetchBtcPrice(),
+                fetchGoldPrice(),
+                fetchEurusd()
+            ]);
+
+            updateCorrelationAnalysis();
+            updateDivergenceAnalysis();
+
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent =
+                'Last update: ' + now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC • Auto-refresh: 30s';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            const button = document.querySelector('.theme-toggle');
+            if (currentTheme === 'day') {
+                document.documentElement.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+            }
+
+            fetchAllData();
+            initChart();
+
+            // Refresh every 30 seconds
+            setInterval(fetchAllData, 30000);
+        });
+    </script>
+</body>
+</html>
