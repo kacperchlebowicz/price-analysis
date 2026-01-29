@@ -764,24 +764,25 @@
                 const paxgRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
                 const paxg = await paxgRes.json();
 
-                marketData.gold.price = parseFloat(paxg.lastPrice);
-                marketData.gold.change24h = parseFloat(paxg.priceChangePercent);
+                marketData.gold.price = parseFloat(paxg.lastPrice) || 2650;
+                marketData.gold.change24h = parseFloat(paxg.priceChangePercent) || 0;
 
-                // Estimate silver from gold/silver ratio (typically ~80-85:1)
-                const goldSilverRatio = 82;
-                marketData.silver.price = marketData.gold.price / goldSilverRatio;
-                // Silver is typically 1.2-1.5x more volatile than gold
-                marketData.silver.change24h = marketData.gold.change24h * 1.3;
-
-                updateMetalsUI();
-                updateTimestamp('tsGold');
-                updateTimestamp('tsSilver');
             } catch (error) {
                 console.error('Failed to fetch metals:', error);
                 // Fallback values
                 marketData.gold.price = 2650;
-                marketData.silver.price = 32;
+                marketData.gold.change24h = 0;
             }
+
+            // Calculate silver from gold/silver ratio (typically ~80-85:1)
+            const goldSilverRatio = 82;
+            marketData.silver.price = marketData.gold.price / goldSilverRatio;
+            // Silver is typically 1.2-1.5x more volatile than gold
+            marketData.silver.change24h = marketData.gold.change24h * 1.3;
+
+            updateMetalsUI();
+            updateTimestamp('tsGold');
+            updateTimestamp('tsSilver');
         }
 
         // Update BTC UI
