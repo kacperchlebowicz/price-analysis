@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Market Summary</title>
+    <meta http-equiv="refresh" content="300">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0a0a0a;
+            --border: #1a1a1a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #999;
+            --text-tertiary: #666;
+            --accent: #fff;
+            --positive: #4a7c59;
+            --negative: #7c4a4a;
+            --neutral: #7c7c4a;
+            --highlight: #2a2a3a;
+        }
+
+        [data-theme="day"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #fff;
+            --border: #e5e5e5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent: #000;
+            --positive: #16a34a;
+            --negative: #dc2626;
+            --neutral: #ea580c;
+            --highlight: #f0f0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            margin: -40px -20px 40px -20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+            font-weight: 500;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .theme-toggle:hover, .refresh-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-tertiary);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-tertiary);
+            font-size: 0.95em;
+        }
+
+        .meta {
+            color: var(--text-tertiary);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        /* Main Verdict Box */
+        .verdict-box {
+            background: var(--highlight);
+            border: 1px solid var(--border);
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .verdict-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 15px;
+        }
+
+        .verdict-main {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .verdict-description {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.85em;
+        }
+
+        .positive { color: var(--positive); }
+        .negative { color: var(--negative); }
+        .neutral { color: var(--neutral); }
+
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .insight-card {
+            background: var(--bg-secondary);
+            padding: 30px;
+        }
+
+        .insight-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .insight-content strong {
+            color: var(--text-primary);
+        }
+
+        /* Position Recommendations */
+        .positions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .position-card {
+            background: var(--bg-secondary);
+            padding: 30px;
+        }
+
+        .position-card.bullish {
+            border-top: 3px solid var(--positive);
+        }
+
+        .position-card.bearish {
+            border-top: 3px solid var(--negative);
+        }
+
+        .position-card.neutral {
+            border-top: 3px solid var(--neutral);
+        }
+
+        .position-asset {
+            font-size: 1.2em;
+            font-weight: 400;
+            margin-bottom: 5px;
+        }
+
+        .position-bias {
+            font-size: 0.85em;
+            margin-bottom: 20px;
+        }
+
+        .position-details {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .position-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9em;
+        }
+
+        .position-label {
+            color: var(--text-secondary);
+        }
+
+        .position-value {
+            color: var(--text-primary);
+        }
+
+        .position-rationale {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Risk Assessment */
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .risk-card {
+            background: var(--bg-secondary);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .risk-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 15px;
+        }
+
+        .risk-value {
+            font-size: 1.3em;
+            font-weight: 400;
+        }
+
+        /* Key Levels */
+        .levels-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 30px;
+        }
+
+        .level-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .level-row:last-child {
+            border-bottom: none;
+        }
+
+        .level-info {
+            flex: 1;
+        }
+
+        .level-asset {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .level-type {
+            font-size: 0.85em;
+            color: var(--text-tertiary);
+        }
+
+        .level-price {
+            font-size: 1.1em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .level-distance {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-left: 15px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 25px;
+            margin-top: 40px;
+            font-size: 0.8em;
+            color: var(--text-tertiary);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+            .positions-grid {
+                grid-template-columns: 1fr;
+            }
+            .risk-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .controls {
+                width: 100%;
+                flex-direction: column;
+            }
+            .verdict-main {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="index.html" class="nav-link">Bitcoin Analysis</a>
+            <a href="metals-crypto-tracker.html" class="nav-link">Metals → Crypto Flow</a>
+            <a href="dxy-tracker.html" class="nav-link">DXY vs Crypto</a>
+            <a href="summary.html" class="nav-link active">AI Summary</a>
+        </nav>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>AI Market Summary</h1>
+                <div class="subtitle">Aggregated insights and position recommendations</div>
+                <div class="meta" id="lastUpdate">Analyzing markets...</div>
+            </div>
+            <div class="controls">
+                <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+                <button class="theme-toggle" onclick="toggleTheme()">Day Mode</button>
+            </div>
+        </div>
+
+        <!-- Main Verdict -->
+        <div class="verdict-box">
+            <div class="verdict-label">Current Market Assessment</div>
+            <div class="verdict-main" id="mainVerdict">Analyzing...</div>
+            <div class="verdict-description" id="mainDescription">
+                Loading market data from all sources to generate comprehensive analysis...
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-label">Bitcoin</div>
+                <div class="stat-value" id="btcPrice">$--,---</div>
+                <div class="stat-change" id="btcChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Gold</div>
+                <div class="stat-value" id="goldPrice">$--,---</div>
+                <div class="stat-change" id="goldChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Silver</div>
+                <div class="stat-value" id="silverPrice">$---</div>
+                <div class="stat-change" id="silverChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">DXY</div>
+                <div class="stat-value" id="dxyPrice">--.-</div>
+                <div class="stat-change" id="dxyChange">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">ETH</div>
+                <div class="stat-value" id="ethPrice">$--,---</div>
+                <div class="stat-change" id="ethChange">--</div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="section">
+            <div class="section-title">Key Insights</div>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-title">Macro Environment</div>
+                    <div class="insight-content" id="macroInsight">
+                        Analyzing dollar strength, risk appetite, and cross-asset correlations...
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Crypto Momentum</div>
+                    <div class="insight-content" id="cryptoInsight">
+                        Evaluating BTC and ETH price action, funding rates, and market structure...
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Precious Metals Flow</div>
+                    <div class="insight-content" id="metalsInsight">
+                        Tracking gold and silver movements relative to crypto for rotation signals...
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Risk Assessment</div>
+                    <div class="insight-content" id="riskInsight">
+                        Monitoring liquidation levels, funding rates, and market positioning...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Position Recommendations -->
+        <div class="section">
+            <div class="section-title">Position Considerations</div>
+            <div class="positions-grid">
+                <div class="position-card" id="btcPosition">
+                    <div class="position-asset">Bitcoin (BTC)</div>
+                    <div class="position-bias" id="btcBias">Analyzing...</div>
+                    <div class="position-details">
+                        <div class="position-row">
+                            <span class="position-label">Entry Zone</span>
+                            <span class="position-value" id="btcEntry">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 1</span>
+                            <span class="position-value" id="btcTarget1">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 2</span>
+                            <span class="position-value" id="btcTarget2">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Stop Loss</span>
+                            <span class="position-value" id="btcStop">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Conviction</span>
+                            <span class="position-value" id="btcConviction">--</span>
+                        </div>
+                    </div>
+                    <div class="position-rationale" id="btcRationale">
+                        Loading analysis...
+                    </div>
+                </div>
+
+                <div class="position-card" id="goldPosition">
+                    <div class="position-asset">Gold (XAU)</div>
+                    <div class="position-bias" id="goldBias">Analyzing...</div>
+                    <div class="position-details">
+                        <div class="position-row">
+                            <span class="position-label">Entry Zone</span>
+                            <span class="position-value" id="goldEntry">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 1</span>
+                            <span class="position-value" id="goldTarget1">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 2</span>
+                            <span class="position-value" id="goldTarget2">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Stop Loss</span>
+                            <span class="position-value" id="goldStop">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Conviction</span>
+                            <span class="position-value" id="goldConviction">--</span>
+                        </div>
+                    </div>
+                    <div class="position-rationale" id="goldRationale">
+                        Loading analysis...
+                    </div>
+                </div>
+
+                <div class="position-card" id="ethPosition">
+                    <div class="position-asset">Ethereum (ETH)</div>
+                    <div class="position-bias" id="ethBias">Analyzing...</div>
+                    <div class="position-details">
+                        <div class="position-row">
+                            <span class="position-label">Entry Zone</span>
+                            <span class="position-value" id="ethEntry">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 1</span>
+                            <span class="position-value" id="ethTarget1">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 2</span>
+                            <span class="position-value" id="ethTarget2">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Stop Loss</span>
+                            <span class="position-value" id="ethStop">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Conviction</span>
+                            <span class="position-value" id="ethConviction">--</span>
+                        </div>
+                    </div>
+                    <div class="position-rationale" id="ethRationale">
+                        Loading analysis...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Metrics -->
+        <div class="section">
+            <div class="section-title">Risk Metrics</div>
+            <div class="risk-grid">
+                <div class="risk-card">
+                    <div class="risk-label">Overall Risk</div>
+                    <div class="risk-value" id="overallRisk">--</div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-label">BTC Funding</div>
+                    <div class="risk-value" id="btcFunding">--</div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-label">Liquidation Risk</div>
+                    <div class="risk-value" id="liqRisk">--</div>
+                </div>
+                <div class="risk-card">
+                    <div class="risk-label">Correlation Status</div>
+                    <div class="risk-value" id="corrStatus">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Levels to Watch -->
+        <div class="section">
+            <div class="section-title">Key Levels to Watch</div>
+            <div class="levels-container">
+                <div class="level-row">
+                    <div class="level-info">
+                        <div class="level-asset">BTC Resistance</div>
+                        <div class="level-type">Break above = bullish continuation</div>
+                    </div>
+                    <div>
+                        <span class="level-price" id="btcResistance">$--,---</span>
+                        <span class="level-distance" id="btcResistanceDist">--</span>
+                    </div>
+                </div>
+                <div class="level-row">
+                    <div class="level-info">
+                        <div class="level-asset">BTC Support</div>
+                        <div class="level-type">Break below = bearish reversal</div>
+                    </div>
+                    <div>
+                        <span class="level-price" id="btcSupport">$--,---</span>
+                        <span class="level-distance" id="btcSupportDist">--</span>
+                    </div>
+                </div>
+                <div class="level-row">
+                    <div class="level-info">
+                        <div class="level-asset">Gold Resistance</div>
+                        <div class="level-type">Key psychological level</div>
+                    </div>
+                    <div>
+                        <span class="level-price" id="goldResistance">$--,---</span>
+                        <span class="level-distance" id="goldResistanceDist">--</span>
+                    </div>
+                </div>
+                <div class="level-row">
+                    <div class="level-info">
+                        <div class="level-asset">DXY Pivot</div>
+                        <div class="level-type">Above = risk-off, Below = risk-on</div>
+                    </div>
+                    <div>
+                        <span class="level-price" id="dxyPivot">--.-</span>
+                        <span class="level-distance" id="dxyPivotDist">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            This analysis is generated algorithmically based on market data and should not be considered financial advice.
+            Always do your own research and consider your risk tolerance before making investment decisions.
+            Past performance does not guarantee future results.
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = localStorage.getItem('summary-theme') || 'night';
+
+        // Global market data
+        let marketData = {
+            btc: { price: 0, change24h: 0, high24h: 0, low24h: 0, funding: 0 },
+            eth: { price: 0, change24h: 0, funding: 0 },
+            gold: { price: 0, change24h: 0 },
+            silver: { price: 0, change24h: 0 },
+            dxy: { price: 0, change24h: 0 },
+            eurusd: { price: 0, change24h: 0 }
+        };
+
+        function formatPrice(price, decimals = 0) {
+            return '$' + parseFloat(price).toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        function formatPercent(value) {
+            const sign = value >= 0 ? '+' : '';
+            return sign + value.toFixed(2) + '%';
+        }
+
+        function getChangeClass(value) {
+            if (value > 0.5) return 'positive';
+            if (value < -0.5) return 'negative';
+            return 'neutral';
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const button = document.querySelector('.theme-toggle');
+
+            if (currentTheme === 'day') {
+                html.removeAttribute('data-theme');
+                button.textContent = 'Day Mode';
+                currentTheme = 'night';
+            } else {
+                html.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+                currentTheme = 'day';
+            }
+
+            localStorage.setItem('summary-theme', currentTheme);
+        }
+
+        // Fetch all market data
+        async function fetchAllData() {
+            try {
+                // Fetch BTC futures
+                const btcRes = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT');
+                const btcData = await btcRes.json();
+                marketData.btc.price = parseFloat(btcData.lastPrice);
+                marketData.btc.change24h = parseFloat(btcData.priceChangePercent);
+                marketData.btc.high24h = parseFloat(btcData.highPrice);
+                marketData.btc.low24h = parseFloat(btcData.lowPrice);
+
+                // Fetch BTC funding
+                const fundingRes = await fetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&limit=1');
+                const fundingData = await fundingRes.json();
+                marketData.btc.funding = fundingData[0] ? parseFloat(fundingData[0].fundingRate) * 100 : 0;
+
+                // Fetch ETH futures
+                const ethRes = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=ETHUSDT');
+                const ethData = await ethRes.json();
+                marketData.eth.price = parseFloat(ethData.lastPrice);
+                marketData.eth.change24h = parseFloat(ethData.priceChangePercent);
+
+                // Fetch ETH funding
+                const ethFundingRes = await fetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol=ETHUSDT&limit=1');
+                const ethFundingData = await ethFundingRes.json();
+                marketData.eth.funding = ethFundingData[0] ? parseFloat(ethFundingData[0].fundingRate) * 100 : 0;
+
+                // Fetch Gold (PAXG)
+                const goldRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
+                const goldData = await goldRes.json();
+                marketData.gold.price = parseFloat(goldData.lastPrice);
+                marketData.gold.change24h = parseFloat(goldData.priceChangePercent);
+
+                // Fetch Silver (XAGUSDT)
+                try {
+                    const silverRes = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAGUSDT');
+                    const silverData = await silverRes.json();
+                    marketData.silver.price = parseFloat(silverData.lastPrice) || 117;
+                    marketData.silver.change24h = parseFloat(silverData.priceChangePercent) || 0;
+                } catch (e) {
+                    marketData.silver.price = marketData.gold.price / 24;
+                    marketData.silver.change24h = marketData.gold.change24h * 1.2;
+                }
+
+                // Estimate DXY from EUR/USD
+                try {
+                    const eurusdRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=EURUSDT');
+                    const eurusdData = await eurusdRes.json();
+                    marketData.eurusd.price = parseFloat(eurusdData.lastPrice);
+                    marketData.eurusd.change24h = parseFloat(eurusdData.priceChangePercent);
+
+                    const baseEurusd = 1.10;
+                    const baseDxy = 100;
+                    const eurusdChange = (marketData.eurusd.price - baseEurusd) / baseEurusd;
+                    marketData.dxy.price = baseDxy * Math.pow(1 - eurusdChange, 0.576);
+                    marketData.dxy.change24h = -marketData.eurusd.change24h * 0.6;
+                } catch (e) {
+                    marketData.dxy.price = 96.3;
+                    marketData.dxy.change24h = 0;
+                }
+
+                updateUI();
+
+            } catch (error) {
+                console.error('Failed to fetch market data:', error);
+            }
+        }
+
+        function updateUI() {
+            // Update quick stats
+            document.getElementById('btcPrice').textContent = formatPrice(marketData.btc.price);
+            const btcChangeEl = document.getElementById('btcChange');
+            btcChangeEl.textContent = formatPercent(marketData.btc.change24h);
+            btcChangeEl.className = 'stat-change ' + getChangeClass(marketData.btc.change24h);
+
+            document.getElementById('goldPrice').textContent = formatPrice(marketData.gold.price);
+            const goldChangeEl = document.getElementById('goldChange');
+            goldChangeEl.textContent = formatPercent(marketData.gold.change24h);
+            goldChangeEl.className = 'stat-change ' + getChangeClass(marketData.gold.change24h);
+
+            document.getElementById('silverPrice').textContent = formatPrice(marketData.silver.price, 2);
+            const silverChangeEl = document.getElementById('silverChange');
+            silverChangeEl.textContent = formatPercent(marketData.silver.change24h);
+            silverChangeEl.className = 'stat-change ' + getChangeClass(marketData.silver.change24h);
+
+            document.getElementById('dxyPrice').textContent = marketData.dxy.price.toFixed(2);
+            const dxyChangeEl = document.getElementById('dxyChange');
+            dxyChangeEl.textContent = formatPercent(marketData.dxy.change24h);
+            dxyChangeEl.className = 'stat-change ' + (marketData.dxy.change24h > 0 ? 'negative' : 'positive');
+
+            document.getElementById('ethPrice').textContent = formatPrice(marketData.eth.price);
+            const ethChangeEl = document.getElementById('ethChange');
+            ethChangeEl.textContent = formatPercent(marketData.eth.change24h);
+            ethChangeEl.className = 'stat-change ' + getChangeClass(marketData.eth.change24h);
+
+            // Generate analysis
+            generateAnalysis();
+
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent =
+                'Last update: ' + now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC • Auto-refresh: 30s';
+        }
+
+        function generateAnalysis() {
+            const btc = marketData.btc;
+            const eth = marketData.eth;
+            const gold = marketData.gold;
+            const silver = marketData.silver;
+            const dxy = marketData.dxy;
+
+            // Calculate aggregate signals
+            const cryptoAvg = (btc.change24h + eth.change24h) / 2;
+            const metalsAvg = (gold.change24h + silver.change24h) / 2;
+            const riskAssetAvg = (cryptoAvg + metalsAvg) / 2;
+
+            // Determine overall verdict
+            const verdictEl = document.getElementById('mainVerdict');
+            const descEl = document.getElementById('mainDescription');
+
+            let verdict = '';
+            let description = '';
+
+            if (dxy.change24h < -0.3 && cryptoAvg > 1) {
+                verdict = 'BULLISH: Risk-On Environment';
+                verdictEl.className = 'verdict-main positive';
+                description = `Dollar weakness (DXY ${formatPercent(dxy.change24h)}) is creating favorable conditions for risk assets. Bitcoin is showing strength at ${formatPercent(btc.change24h)} with healthy funding rates. This macro backdrop typically supports crypto appreciation. Consider accumulating on dips.`;
+            } else if (dxy.change24h > 0.3 && cryptoAvg < -1) {
+                verdict = 'BEARISH: Risk-Off Environment';
+                verdictEl.className = 'verdict-main negative';
+                description = `Dollar strength (DXY ${formatPercent(dxy.change24h)}) is creating headwinds for risk assets. Bitcoin declining at ${formatPercent(btc.change24h)} with pressure across the board. Consider reducing exposure or hedging positions until macro conditions improve.`;
+            } else if (Math.abs(cryptoAvg) < 1 && Math.abs(dxy.change24h) < 0.3) {
+                verdict = 'NEUTRAL: Consolidation Phase';
+                verdictEl.className = 'verdict-main neutral';
+                description = `Markets are in consolidation with no clear directional bias. BTC ${formatPercent(btc.change24h)}, DXY ${formatPercent(dxy.change24h)}. Wait for a clear breakout or breakdown before establishing new positions. Range trading strategies may be appropriate.`;
+            } else if (dxy.change24h > 0 && cryptoAvg > 0) {
+                verdict = 'CAUTION: Unusual Correlation';
+                verdictEl.className = 'verdict-main neutral';
+                description = `Both dollar and crypto are rising together - an unusual correlation that often precedes volatility. BTC ${formatPercent(btc.change24h)} despite DXY ${formatPercent(dxy.change24h)}. This divergence may resolve sharply. Trade with caution and tight stops.`;
+            } else {
+                verdict = 'MIXED: Selective Opportunities';
+                verdictEl.className = 'verdict-main neutral';
+                description = `Mixed signals across asset classes. BTC ${formatPercent(btc.change24h)}, Gold ${formatPercent(gold.change24h)}, DXY ${formatPercent(dxy.change24h)}. Focus on individual asset setups rather than macro themes. Quality over quantity in position sizing.`;
+            }
+
+            verdictEl.textContent = verdict;
+            descEl.textContent = description;
+
+            // Generate insights
+            generateInsights(cryptoAvg, metalsAvg, dxy);
+
+            // Generate position recommendations
+            generatePositions(cryptoAvg, metalsAvg, dxy);
+
+            // Update risk metrics
+            updateRiskMetrics();
+
+            // Update key levels
+            updateKeyLevels();
+        }
+
+        function generateInsights(cryptoAvg, metalsAvg, dxy) {
+            // Macro insight
+            let macroInsight = '';
+            if (dxy.change24h < -0.5) {
+                macroInsight = `<strong>Dollar Weakness Detected:</strong> The DXY is declining at ${formatPercent(dxy.change24h)}, which historically supports risk asset appreciation. EUR/USD strength at ${marketData.eurusd.price.toFixed(4)} is pressuring the dollar. This environment favors long positions in BTC and Gold.`;
+            } else if (dxy.change24h > 0.5) {
+                macroInsight = `<strong>Dollar Strength Alert:</strong> The DXY is rising at ${formatPercent(dxy.change24h)}, creating headwinds for risk assets. This typically occurs during risk-off periods or Fed hawkishness. Consider defensive positioning and tight risk management.`;
+            } else {
+                macroInsight = `<strong>Stable Dollar Environment:</strong> DXY is relatively flat at ${formatPercent(dxy.change24h)}. No strong macro directional bias from currency markets. Focus on individual asset technicals and crypto-specific catalysts.`;
+            }
+            document.getElementById('macroInsight').innerHTML = macroInsight;
+
+            // Crypto insight
+            let cryptoInsight = '';
+            if (marketData.btc.change24h > 2) {
+                cryptoInsight = `<strong>Strong Crypto Momentum:</strong> BTC rallying ${formatPercent(marketData.btc.change24h)} with ETH following at ${formatPercent(marketData.eth.change24h)}. Funding rate at ${marketData.btc.funding.toFixed(4)}% suggests ${marketData.btc.funding > 0.05 ? 'overheated longs - watch for pullback' : 'healthy positioning - room for continuation'}.`;
+            } else if (marketData.btc.change24h < -2) {
+                cryptoInsight = `<strong>Crypto Under Pressure:</strong> BTC declining ${formatPercent(marketData.btc.change24h)} with broad weakness across alts. ${marketData.btc.funding < 0 ? 'Negative funding suggests shorts are crowded - potential squeeze setup.' : 'Watch for capitulation volume before looking for entries.'}`;
+            } else {
+                cryptoInsight = `<strong>Crypto Consolidating:</strong> BTC range-bound at ${formatPercent(marketData.btc.change24h)}. Current range: ${formatPrice(marketData.btc.low24h)} - ${formatPrice(marketData.btc.high24h)}. Funding neutral at ${marketData.btc.funding.toFixed(4)}%. Wait for range break for directional trades.`;
+            }
+            document.getElementById('cryptoInsight').innerHTML = cryptoInsight;
+
+            // Metals insight
+            let metalsInsight = '';
+            const flowDirection = cryptoAvg - metalsAvg;
+            if (flowDirection > 2) {
+                metalsInsight = `<strong>Rotation to Crypto:</strong> Capital appears to be flowing from metals to crypto. Gold ${formatPercent(marketData.gold.change24h)} while BTC ${formatPercent(marketData.btc.change24h)}. This risk-on rotation typically favors crypto outperformance in the near term.`;
+            } else if (flowDirection < -2) {
+                metalsInsight = `<strong>Rotation to Safe Havens:</strong> Gold outperforming at ${formatPercent(marketData.gold.change24h)} while crypto lags. Silver also strong at ${formatPercent(marketData.silver.change24h)}. This suggests risk-off sentiment - consider gold exposure as a hedge.`;
+            } else {
+                metalsInsight = `<strong>No Clear Rotation:</strong> Gold ${formatPercent(marketData.gold.change24h)}, Silver ${formatPercent(marketData.silver.change24h)}. Both asset classes moving together without significant divergence. Monitor for rotation signals as a leading indicator.`;
+            }
+            document.getElementById('metalsInsight').innerHTML = metalsInsight;
+
+            // Risk insight
+            let riskInsight = '';
+            const fundingRisk = Math.abs(marketData.btc.funding) > 0.05 ? 'elevated' : 'normal';
+            const range = marketData.btc.high24h - marketData.btc.low24h;
+            const volatility = (range / marketData.btc.price * 100).toFixed(1);
+
+            riskInsight = `<strong>Risk Assessment:</strong> 24h volatility at ${volatility}% range. Funding rates ${fundingRisk} at ${marketData.btc.funding.toFixed(4)}%. ${marketData.btc.funding > 0.08 ? 'WARNING: Extreme long positioning increases liquidation cascade risk.' : marketData.btc.funding < -0.03 ? 'Short squeeze potential as funding turns negative.' : 'Positioning appears balanced.'} Size positions accordingly.`;
+            document.getElementById('riskInsight').innerHTML = riskInsight;
+        }
+
+        function generatePositions(cryptoAvg, metalsAvg, dxy) {
+            const btc = marketData.btc;
+            const gold = marketData.gold;
+            const eth = marketData.eth;
+
+            // BTC Position
+            const btcCard = document.getElementById('btcPosition');
+            const btcBiasEl = document.getElementById('btcBias');
+            let btcBias = 'neutral';
+
+            if (btc.change24h > 1 && dxy.change24h < 0) {
+                btcBias = 'bullish';
+                btcBiasEl.innerHTML = '<span class="positive">BULLISH</span> - Long Bias';
+                btcCard.className = 'position-card bullish';
+            } else if (btc.change24h < -1 && dxy.change24h > 0) {
+                btcBias = 'bearish';
+                btcBiasEl.innerHTML = '<span class="negative">BEARISH</span> - Short Bias';
+                btcCard.className = 'position-card bearish';
+            } else {
+                btcBiasEl.innerHTML = '<span class="neutral">NEUTRAL</span> - Range Trade';
+                btcCard.className = 'position-card neutral';
+            }
+
+            const btcRange = btc.high24h - btc.low24h;
+            document.getElementById('btcEntry').textContent = btcBias === 'bullish' ?
+                formatPrice(btc.price * 0.99) + ' - ' + formatPrice(btc.price) :
+                btcBias === 'bearish' ? formatPrice(btc.price) + ' - ' + formatPrice(btc.price * 1.01) :
+                formatPrice(btc.low24h) + ' - ' + formatPrice(btc.high24h);
+            document.getElementById('btcTarget1').textContent = btcBias === 'bullish' ?
+                formatPrice(btc.price + btcRange * 0.5) : formatPrice(btc.price - btcRange * 0.5);
+            document.getElementById('btcTarget2').textContent = btcBias === 'bullish' ?
+                formatPrice(btc.price + btcRange) : formatPrice(btc.price - btcRange);
+            document.getElementById('btcStop').textContent = btcBias === 'bullish' ?
+                formatPrice(btc.low24h * 0.99) : formatPrice(btc.high24h * 1.01);
+            document.getElementById('btcConviction').textContent =
+                Math.abs(btc.change24h) > 3 && Math.abs(dxy.change24h) > 0.5 ? 'High' :
+                Math.abs(btc.change24h) > 1 ? 'Medium' : 'Low';
+
+            document.getElementById('btcRationale').textContent = btcBias === 'bullish' ?
+                `Strong momentum with DXY weakness supports continuation. Funding at ${btc.funding.toFixed(4)}% suggests room for upside. Enter on pullbacks to VWAP or 24h lows.` :
+                btcBias === 'bearish' ?
+                `Dollar strength creating headwinds. Consider shorts on rallies to resistance with stops above 24h highs. Watch for capitulation volume.` :
+                `Range-bound price action. Buy support, sell resistance. Avoid chasing breakouts until confirmed with volume.`;
+
+            // Gold Position
+            const goldCard = document.getElementById('goldPosition');
+            const goldBiasEl = document.getElementById('goldBias');
+            let goldBias = 'neutral';
+
+            if (gold.change24h > 0.5 || (gold.change24h > 0 && dxy.change24h > 0)) {
+                goldBias = 'bullish';
+                goldBiasEl.innerHTML = '<span class="positive">BULLISH</span> - Long Bias';
+                goldCard.className = 'position-card bullish';
+            } else if (gold.change24h < -0.5 && dxy.change24h < 0) {
+                goldBias = 'bearish';
+                goldBiasEl.innerHTML = '<span class="negative">BEARISH</span> - Reduce Exposure';
+                goldCard.className = 'position-card bearish';
+            } else {
+                goldBiasEl.innerHTML = '<span class="neutral">NEUTRAL</span> - Hold';
+                goldCard.className = 'position-card neutral';
+            }
+
+            document.getElementById('goldEntry').textContent = formatPrice(gold.price * 0.995, 0) + ' - ' + formatPrice(gold.price, 0);
+            document.getElementById('goldTarget1').textContent = formatPrice(gold.price * 1.02, 0);
+            document.getElementById('goldTarget2').textContent = formatPrice(gold.price * 1.05, 0);
+            document.getElementById('goldStop').textContent = formatPrice(gold.price * 0.97, 0);
+            document.getElementById('goldConviction').textContent =
+                (gold.change24h > 0 && dxy.change24h > 0) ? 'High (safe haven demand)' :
+                Math.abs(gold.change24h) > 1 ? 'Medium' : 'Low';
+
+            document.getElementById('goldRationale').textContent = goldBias === 'bullish' ?
+                `Gold showing strength ${dxy.change24h > 0 ? 'despite dollar strength - unusual safe haven demand' : 'with dollar weakness - classic inverse correlation'}. Consider as portfolio hedge or directional long.` :
+                goldBias === 'bearish' ?
+                `Gold weakness in favorable dollar environment is unusual. May indicate risk-on sentiment overwhelming safe haven flows. Reduce or hedge gold exposure.` :
+                `Gold consolidating within normal ranges. Maintain existing positions. Add on dips toward support levels.`;
+
+            // ETH Position
+            const ethCard = document.getElementById('ethPosition');
+            const ethBiasEl = document.getElementById('ethBias');
+            let ethBias = 'neutral';
+
+            const ethBtcRatio = eth.change24h - btc.change24h;
+            if (eth.change24h > 2 || (eth.change24h > btc.change24h && btc.change24h > 0)) {
+                ethBias = 'bullish';
+                ethBiasEl.innerHTML = '<span class="positive">BULLISH</span> - Outperforming BTC';
+                ethCard.className = 'position-card bullish';
+            } else if (eth.change24h < -2 || (eth.change24h < btc.change24h - 1)) {
+                ethBias = 'bearish';
+                ethBiasEl.innerHTML = '<span class="negative">BEARISH</span> - Underperforming';
+                ethCard.className = 'position-card bearish';
+            } else {
+                ethBiasEl.innerHTML = '<span class="neutral">NEUTRAL</span> - Following BTC';
+                ethCard.className = 'position-card neutral';
+            }
+
+            document.getElementById('ethEntry').textContent = formatPrice(eth.price * 0.99) + ' - ' + formatPrice(eth.price);
+            document.getElementById('ethTarget1').textContent = formatPrice(eth.price * 1.05);
+            document.getElementById('ethTarget2').textContent = formatPrice(eth.price * 1.10);
+            document.getElementById('ethStop').textContent = formatPrice(eth.price * 0.95);
+            document.getElementById('ethConviction').textContent =
+                Math.abs(ethBtcRatio) > 2 ? 'High' : Math.abs(eth.change24h) > 2 ? 'Medium' : 'Low';
+
+            document.getElementById('ethRationale').textContent = ethBias === 'bullish' ?
+                `ETH showing relative strength vs BTC (${formatPercent(ethBtcRatio)} spread). Often a sign of alt-season beginning or risk appetite increasing. Consider ETH or high-beta alts.` :
+                ethBias === 'bearish' ?
+                `ETH lagging BTC by ${formatPercent(ethBtcRatio)}. Risk-off within crypto favoring BTC dominance. Rotate to BTC or reduce alt exposure.` :
+                `ETH tracking BTC with normal correlation. Trade as leveraged BTC play or focus on specific catalysts.`;
+        }
+
+        function updateRiskMetrics() {
+            // Overall risk
+            const overallRiskEl = document.getElementById('overallRisk');
+            const fundingAbs = Math.abs(marketData.btc.funding);
+            const volatility = (marketData.btc.high24h - marketData.btc.low24h) / marketData.btc.price * 100;
+
+            if (fundingAbs > 0.08 || volatility > 5) {
+                overallRiskEl.textContent = 'HIGH';
+                overallRiskEl.className = 'risk-value negative';
+            } else if (fundingAbs > 0.04 || volatility > 3) {
+                overallRiskEl.textContent = 'MEDIUM';
+                overallRiskEl.className = 'risk-value neutral';
+            } else {
+                overallRiskEl.textContent = 'LOW';
+                overallRiskEl.className = 'risk-value positive';
+            }
+
+            // BTC Funding
+            const fundingEl = document.getElementById('btcFunding');
+            fundingEl.textContent = marketData.btc.funding.toFixed(4) + '%';
+            fundingEl.className = 'risk-value ' + (marketData.btc.funding > 0.05 ? 'negative' : marketData.btc.funding < -0.02 ? 'positive' : 'neutral');
+
+            // Liquidation risk
+            const liqRiskEl = document.getElementById('liqRisk');
+            if (fundingAbs > 0.08) {
+                liqRiskEl.textContent = 'ELEVATED';
+                liqRiskEl.className = 'risk-value negative';
+            } else if (fundingAbs > 0.04) {
+                liqRiskEl.textContent = 'MODERATE';
+                liqRiskEl.className = 'risk-value neutral';
+            } else {
+                liqRiskEl.textContent = 'NORMAL';
+                liqRiskEl.className = 'risk-value positive';
+            }
+
+            // Correlation status
+            const corrEl = document.getElementById('corrStatus');
+            const dxyUp = marketData.dxy.change24h > 0.2;
+            const btcUp = marketData.btc.change24h > 0.5;
+
+            if ((dxyUp && !btcUp) || (!dxyUp && btcUp)) {
+                corrEl.textContent = 'NORMAL';
+                corrEl.className = 'risk-value positive';
+            } else if (Math.abs(marketData.dxy.change24h) < 0.2 || Math.abs(marketData.btc.change24h) < 0.5) {
+                corrEl.textContent = 'NEUTRAL';
+                corrEl.className = 'risk-value neutral';
+            } else {
+                corrEl.textContent = 'DIVERGING';
+                corrEl.className = 'risk-value negative';
+            }
+        }
+
+        function updateKeyLevels() {
+            const btc = marketData.btc;
+            const gold = marketData.gold;
+            const dxy = marketData.dxy;
+
+            // BTC Resistance
+            const btcResistance = btc.high24h;
+            document.getElementById('btcResistance').textContent = formatPrice(btcResistance);
+            const btcResDist = ((btcResistance - btc.price) / btc.price * 100).toFixed(2);
+            document.getElementById('btcResistanceDist').textContent = '+' + btcResDist + '%';
+
+            // BTC Support
+            const btcSupport = btc.low24h;
+            document.getElementById('btcSupport').textContent = formatPrice(btcSupport);
+            const btcSupDist = ((btc.price - btcSupport) / btc.price * 100).toFixed(2);
+            document.getElementById('btcSupportDist').textContent = '-' + btcSupDist + '%';
+
+            // Gold Resistance
+            const goldResistance = Math.ceil(gold.price / 50) * 50; // Round up to nearest 50
+            document.getElementById('goldResistance').textContent = formatPrice(goldResistance);
+            const goldResDist = ((goldResistance - gold.price) / gold.price * 100).toFixed(2);
+            document.getElementById('goldResistanceDist').textContent = '+' + goldResDist + '%';
+
+            // DXY Pivot
+            const dxyPivot = 100;
+            document.getElementById('dxyPivot').textContent = dxyPivot.toFixed(2);
+            const dxyDist = ((dxy.price - dxyPivot) / dxyPivot * 100).toFixed(2);
+            document.getElementById('dxyPivotDist').textContent = dxyDist + '%';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            const button = document.querySelector('.theme-toggle');
+            if (currentTheme === 'day') {
+                document.documentElement.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+            }
+
+            fetchAllData();
+
+            // Refresh every 30 seconds
+            setInterval(fetchAllData, 30000);
+        });
+    </script>
+</body>
+</html>
