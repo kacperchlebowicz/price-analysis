@@ -757,9 +757,9 @@
             }
         }
 
-        // Fetch metals prices - use PAXG for gold, estimate silver
+        // Fetch metals prices from Binance
         async function fetchMetalsPrices() {
-            // Use PAXG (Pax Gold) from Binance - it's backed 1:1 by physical gold
+            // Fetch gold from PAXG (Pax Gold) - backed 1:1 by physical gold
             try {
                 const paxgRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
                 if (paxgRes.ok) {
@@ -775,12 +775,22 @@
                 marketData.gold.change24h = 0;
             }
 
-            // Calculate silver from gold using current gold/silver ratio
-            // Ratio of ~24 gives silver around $115-120 when gold is ~$2800
-            const goldSilverRatio = 24;
-            marketData.silver.price = marketData.gold.price / goldSilverRatio;
-            // Silver tends to be more volatile than gold
-            marketData.silver.change24h = marketData.gold.change24h * 1.2;
+            // Fetch silver from XAGUSDT perpetual futures on Binance
+            try {
+                const xagRes = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=XAGUSDT');
+                if (xagRes.ok) {
+                    const xag = await xagRes.json();
+                    marketData.silver.price = parseFloat(xag.lastPrice) || 117;
+                    marketData.silver.change24h = parseFloat(xag.priceChangePercent) || 0;
+                } else {
+                    throw new Error('XAGUSDT fetch failed');
+                }
+            } catch (e) {
+                console.log('XAGUSDT API error, using gold ratio fallback:', e);
+                // Fallback: estimate from gold
+                marketData.silver.price = marketData.gold.price / 24;
+                marketData.silver.change24h = marketData.gold.change24h * 1.2;
+            }
 
             updateMetalsUI();
             updateTimestamp('tsGold');
