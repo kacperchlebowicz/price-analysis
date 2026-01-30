@@ -4,228 +4,366 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Options Flow - BTC & Gold</title>
+    <meta http-equiv="refresh" content="300">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0a0a0a;
+            --border: #1a1a1a;
+            --text-primary: #e5e5e5;
+            --text-secondary: #999;
+            --text-tertiary: #666;
+            --accent: #fff;
+            --positive: #4a7c59;
+            --negative: #7c4a4a;
+            --neutral: #7c7c4a;
         }
+
+        [data-theme="day"] {
+            --bg-primary: #fafafa;
+            --bg-secondary: #fff;
+            --border: #e5e5e5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent: #000;
+            --positive: #16a34a;
+            --negative: #dc2626;
+            --neutral: #ea580c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-            color: #e4e4e7;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        .header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #f59e0b, #fbbf24, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #a1a1aa;
-            font-size: 1.1rem;
-        }
-
-        .nav-tabs {
+        /* Navigation */
+        .nav {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            margin: -40px -20px 40px -20px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
-        .nav-tab {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: #e4e4e7;
+        .nav-link {
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            white-space: nowrap;
         }
 
-        .nav-tab:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
         }
 
-        .nav-tab.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-color: #f59e0b;
-            color: #000;
-            font-weight: 600;
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            border-color: var(--border);
+            font-weight: 500;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
+        /* Dropdown Navigation */
+        .nav-dropdown {
+            display: none;
+            position: relative;
         }
 
-        .card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(10px);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            color: #a1a1aa;
-            margin-bottom: 16px;
+        .nav-dropdown-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-family: inherit;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .card-title .icon {
-            font-size: 1.3rem;
+        .nav-dropdown-btn:hover {
+            border-color: var(--text-tertiary);
         }
 
-        .metric-large {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+        .nav-dropdown-btn::after {
+            content: "▼";
+            font-size: 0.7em;
         }
 
-        .metric-medium {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 4px;
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .metric-small {
-            font-size: 1rem;
-            color: #a1a1aa;
+        .nav-dropdown-content.show {
+            display: block;
         }
 
-        .positive { color: #22c55e; }
-        .negative { color: #ef4444; }
-        .neutral { color: #f59e0b; }
-        .bullish { color: #22c55e; }
-        .bearish { color: #ef4444; }
+        .nav-dropdown-content a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85em;
+            border-bottom: 1px solid var(--border);
+        }
 
+        .nav-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .nav-dropdown-content a:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .nav-dropdown-content a.active {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+            .nav-dropdown {
+                display: block;
+            }
+        }
+
+        .header {
+            margin-bottom: 60px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-content { flex: 1; }
+        .controls { display: flex; gap: 10px; }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .theme-toggle:hover, .refresh-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--text-tertiary);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle { color: var(--text-tertiary); font-size: 0.95em; }
+        .meta { color: var(--text-tertiary); font-size: 0.9em; margin-top: 10px; }
+
+        .section { margin: 60px 0; }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            letter-spacing: -0.01em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            margin-bottom: 1px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            padding: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .card-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .card-timestamp {
+            font-size: 0.7em;
+            color: var(--text-tertiary);
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+            text-align: right;
+        }
+
+        .price-large {
+            font-size: 2em;
+            font-weight: 200;
+            margin-bottom: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric-row:last-child { border-bottom: none; }
+        .metric-label { color: var(--text-secondary); font-size: 0.9em; }
+        .metric-value { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+
+        .positive { color: var(--positive); }
+        .negative { color: var(--negative); }
+        .neutral { color: var(--neutral); }
+
+        /* Verdict Banner */
+        .verdict-banner {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .verdict-banner.bullish { border-left: 3px solid var(--positive); }
+        .verdict-banner.bearish { border-left: 3px solid var(--negative); }
+        .verdict-banner.neutral-verdict { border-left: 3px solid var(--neutral); }
+
+        .verdict-icon { font-size: 2.5em; opacity: 0.8; }
+        .verdict-content { flex: 1; }
+        .verdict-title { font-size: 1.2em; font-weight: 400; margin-bottom: 5px; }
+        .verdict-description { color: var(--text-secondary); font-size: 0.9em; }
+
+        /* Signal Boxes */
         .signal-box {
             padding: 16px;
-            border-radius: 12px;
             margin-top: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
         }
 
         .signal-box.bullish {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-left: 3px solid var(--positive);
         }
 
         .signal-box.bearish {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-left: 3px solid var(--negative);
         }
 
         .signal-box.neutral {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 3px solid var(--neutral);
         }
 
         .signal-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 0.9em;
+            font-weight: 500;
             margin-bottom: 8px;
         }
 
         .signal-desc {
-            font-size: 0.95rem;
-            color: #d4d4d8;
+            font-size: 0.85em;
+            color: var(--text-secondary);
             line-height: 1.5;
         }
 
-        .progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 12px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-fill.calls {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
-        }
-
-        .progress-fill.puts {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
-        }
-
+        /* Ratio Bar */
         .ratio-bar {
             display: flex;
             height: 24px;
-            border-radius: 6px;
             overflow: hidden;
             margin: 12px 0;
+            border: 1px solid var(--border);
         }
 
         .ratio-calls {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
+            background: var(--positive);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
+            font-weight: 500;
+            font-size: 0.75em;
         }
 
         .ratio-puts {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
+            background: var(--negative);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
+            font-weight: 500;
+            font-size: 0.75em;
         }
 
-        .strike-table {
-            width: 100%;
-            margin-top: 12px;
-        }
-
+        /* Strike Table */
         .strike-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
         }
 
-        .strike-row:last-child {
-            border-bottom: none;
-        }
+        .strike-row:last-child { border-bottom: none; }
 
-        .strike-price {
-            font-weight: 600;
-        }
-
-        .strike-price.max-pain {
-            color: #f59e0b;
-        }
+        .strike-price { font-weight: 500; }
+        .strike-price.max-pain { color: var(--neutral); }
 
         .oi-bar {
             display: flex;
@@ -234,414 +372,390 @@
         }
 
         .oi-visual {
-            width: 100px;
+            width: 80px;
             height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
+            background: var(--border);
             overflow: hidden;
         }
 
-        .oi-fill {
-            height: 100%;
-            border-radius: 3px;
-        }
+        .oi-fill { height: 100%; }
+        .oi-fill.call { background: var(--positive); }
+        .oi-fill.put { background: var(--negative); }
 
-        .oi-fill.call {
-            background: #22c55e;
-        }
-
-        .oi-fill.put {
-            background: #ef4444;
-        }
-
-        .expiry-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .expiry-label {
-            font-size: 0.9rem;
-            color: #a1a1aa;
-            margin-bottom: 8px;
-        }
-
-        .time-horizon {
+        /* Key Levels */
+        .key-levels {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
             margin-top: 16px;
         }
 
-        .horizon-box {
+        .level-box {
+            text-align: center;
             padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
+            background: var(--bg-secondary);
         }
 
-        .horizon-title {
-            font-size: 0.9rem;
-            color: #a1a1aa;
-            margin-bottom: 8px;
+        .level-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 6px;
         }
 
-        .horizon-impact {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .level-value {
+            font-size: 1.1em;
+            font-weight: 400;
+        }
+
+        /* Gamma Visual */
+        .gamma-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        .gamma-bar {
+            width: 180px;
+            height: 16px;
+            background: linear-gradient(90deg, var(--negative), var(--text-tertiary) 50%, var(--positive));
+            position: relative;
+        }
+
+        .gamma-marker {
+            position: absolute;
+            top: -4px;
+            width: 3px;
+            height: 24px;
+            background: var(--text-primary);
+            transform: translateX(-50%);
+        }
+
+        /* Impact Grid */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .impact-section {
+            background: var(--bg-secondary);
+            padding: 24px;
+        }
+
+        .impact-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            margin-bottom: 16px;
+            font-weight: 500;
         }
 
         .impact-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9em;
         }
 
-        .impact-item:last-child {
-            border-bottom: none;
-        }
+        .impact-item:last-child { border-bottom: none; }
 
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
+        /* Chart Container */
         .chart-container {
-            width: 100%;
-            height: 400px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0;
         }
 
-        .key-levels {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px;
+        .chart-inner {
+            height: 450px;
         }
 
-        .level-box {
-            text-align: center;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-        }
-
-        .level-label {
-            font-size: 0.8rem;
-            color: #a1a1aa;
-            margin-bottom: 4px;
-        }
-
-        .level-value {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .verdict-box {
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .verdict-box.bullish {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1));
-            border: 2px solid rgba(34, 197, 94, 0.4);
-        }
-
-        .verdict-box.bearish {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
-            border: 2px solid rgba(239, 68, 68, 0.4);
-        }
-
-        .verdict-box.neutral {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
-            border: 2px solid rgba(245, 158, 11, 0.4);
-        }
-
-        .verdict-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .verdict-subtitle {
-            font-size: 1rem;
-            color: #d4d4d8;
-        }
-
-        .timestamp {
-            text-align: center;
-            color: #71717a;
-            font-size: 0.85rem;
-            margin-top: 20px;
-        }
-
-        .loading {
-            text-align: center;
+        /* Summary */
+        .summary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
             padding: 40px;
-            color: #a1a1aa;
+            text-align: center;
         }
 
-        .gamma-visual {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 16px 0;
-        }
+        .summary-title { font-size: 1.2em; font-weight: 300; margin-bottom: 30px; }
+        .summary-verdict { font-size: 1.5em; font-weight: 400; margin-bottom: 15px; }
+        .summary-detail { color: var(--text-secondary); font-size: 0.95em; max-width: 600px; margin: 0 auto; }
 
-        .gamma-bar {
-            width: 200px;
-            height: 20px;
-            background: linear-gradient(90deg, #ef4444, #71717a 50%, #22c55e);
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .gamma-marker {
-            position: absolute;
-            top: -5px;
-            width: 4px;
-            height: 30px;
-            background: white;
-            border-radius: 2px;
-            transform: translateX(-50%);
-        }
-
+        /* Disclaimer */
         .disclaimer {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 30px;
-            max-width: 1600px;
-            margin-left: auto;
-            margin-right: auto;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--negative);
+            padding: 20px;
+            margin-top: 40px;
         }
 
         .disclaimer-title {
-            color: #ef4444;
-            font-weight: 600;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--negative);
             margin-bottom: 8px;
+            font-weight: 500;
         }
 
         .disclaimer-text {
-            color: #a1a1aa;
-            font-size: 0.85rem;
-            line-height: 1.5;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .impact-grid { grid-template-columns: 1fr; }
+            .key-levels { grid-template-columns: 1fr; }
+            h1 { font-size: 2em; }
+            .header { flex-direction: column; gap: 20px; }
+            .controls { width: 100%; }
+            .theme-toggle, .refresh-btn { flex: 1; }
+            .verdict-banner { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Options Flow Analysis</h1>
-        <p>BTC & Gold Options Impact on Price | Max Pain & Greeks</p>
-    </div>
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Bitcoin Analysis</a>
+                <a href="alts-tracker.html" class="nav-link">ETH & SOL vs BTC</a>
+                <a href="metals-crypto-tracker.html" class="nav-link">Metals / Crypto</a>
+                <a href="dxy-tracker.html" class="nav-link">DXY vs Crypto</a>
+                <a href="options-tracker.html" class="nav-link active">Options Flow</a>
+                <a href="summary.html" class="nav-link">AI Summary</a>
+            </div>
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn" onclick="toggleDropdown()">
+                    <span>Options Flow</span>
+                </button>
+                <div class="nav-dropdown-content" id="navDropdown">
+                    <a href="index.html">Bitcoin Analysis</a>
+                    <a href="alts-tracker.html">ETH & SOL vs BTC</a>
+                    <a href="metals-crypto-tracker.html">Metals / Crypto</a>
+                    <a href="dxy-tracker.html">DXY vs Crypto</a>
+                    <a href="options-tracker.html" class="active">Options Flow</a>
+                    <a href="summary.html">AI Summary</a>
+                </div>
+            </div>
+        </nav>
 
-    <nav class="nav-tabs">
-        <a href="index.html" class="nav-tab">Bitcoin Analysis</a>
-        <a href="alts-tracker.html" class="nav-tab">ETH & SOL vs BTC</a>
-        <a href="metals-crypto-tracker.html" class="nav-tab">Metals / Crypto</a>
-        <a href="dxy-tracker.html" class="nav-tab">DXY vs Crypto</a>
-        <a href="options-tracker.html" class="nav-tab active">Options Flow</a>
-        <a href="summary.html" class="nav-tab">AI Summary</a>
-    </nav>
-
-    <div class="grid">
-        <!-- Overall Options Verdict -->
-        <div class="card full-width">
-            <div class="card-title"><span class="icon">🎯</span> Options Market Verdict</div>
-            <div id="overallVerdict" class="verdict-box neutral">
-                <div class="verdict-title">Loading...</div>
-                <div class="verdict-subtitle">Analyzing options flow...</div>
+        <div class="header">
+            <div class="header-content">
+                <h1>Options Flow</h1>
+                <div class="subtitle">BTC & Gold Options Impact on Price | Max Pain & Greeks</div>
+                <div class="meta" id="lastUpdate">Connecting to markets...</div>
+            </div>
+            <div class="controls">
+                <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+                <button class="theme-toggle" onclick="toggleTheme()">Day Mode</button>
             </div>
         </div>
 
-        <!-- BTC Max Pain -->
-        <div class="card">
-            <div class="card-title"><span class="icon">₿</span> BTC Max Pain Level</div>
-            <div id="btcMaxPain" class="metric-large neutral">--</div>
-            <div class="metric-small">Price gravitates here at expiry</div>
-            <div id="btcMaxPainAnalysis" class="signal-box neutral">
-                <div class="signal-title">Loading...</div>
-                <div class="signal-desc">Calculating max pain...</div>
-            </div>
-            <div class="key-levels">
-                <div class="level-box">
-                    <div class="level-label">Current Price</div>
-                    <div id="btcCurrentPrice" class="level-value">--</div>
-                </div>
-                <div class="level-box">
-                    <div class="level-label">Distance to MP</div>
-                    <div id="btcMaxPainDist" class="level-value">--</div>
-                </div>
-                <div class="level-box">
-                    <div class="level-label">Next Expiry</div>
-                    <div id="btcNextExpiry" class="level-value">--</div>
-                </div>
+        <!-- Verdict Banner -->
+        <div class="verdict-banner neutral-verdict" id="verdictBanner">
+            <div class="verdict-icon" id="verdictIcon">⚖️</div>
+            <div class="verdict-content">
+                <div class="verdict-title" id="verdictTitle">Analyzing Options Flow...</div>
+                <div class="verdict-description" id="verdictDescription">Loading market data to determine options sentiment</div>
             </div>
         </div>
 
-        <!-- BTC Put/Call Ratio -->
-        <div class="card">
-            <div class="card-title"><span class="icon">📊</span> BTC Put/Call Ratio</div>
-            <div id="btcPCRatio" class="metric-large">--</div>
-            <div class="metric-small">Open Interest Ratio</div>
-            <div id="btcPCBar" class="ratio-bar">
-                <div class="ratio-calls" style="width: 50%">Calls 50%</div>
-                <div class="ratio-puts" style="width: 50%">Puts 50%</div>
+        <!-- Main Metrics -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">BTC Max Pain Level</div>
+                <div class="price-large" id="btcMaxPain">$--,---</div>
+                <div class="metric-row">
+                    <span class="metric-label">Current Price</span>
+                    <span class="metric-value" id="btcCurrentPrice">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Distance to Max Pain</span>
+                    <span class="metric-value" id="btcMaxPainDist">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Next Expiry</span>
+                    <span class="metric-value" id="btcNextExpiry">—</span>
+                </div>
+                <div id="btcMaxPainAnalysis" class="signal-box neutral">
+                    <div class="signal-title">Loading...</div>
+                    <div class="signal-desc">Calculating max pain...</div>
+                </div>
+                <div class="card-timestamp" id="tsBtcMP">—</div>
             </div>
-            <div id="btcPCAnalysis" class="signal-box neutral">
-                <div class="signal-title">Loading...</div>
-                <div class="signal-desc">Analyzing sentiment...</div>
+
+            <div class="card">
+                <div class="card-title">BTC Put/Call Ratio</div>
+                <div class="price-large" id="btcPCRatio">--.--</div>
+                <div id="btcPCBar" class="ratio-bar">
+                    <div class="ratio-calls" style="width: 50%">Calls 50%</div>
+                    <div class="ratio-puts" style="width: 50%">Puts 50%</div>
+                </div>
+                <div id="btcPCAnalysis" class="signal-box neutral">
+                    <div class="signal-title">Loading...</div>
+                    <div class="signal-desc">Analyzing sentiment...</div>
+                </div>
+                <div class="card-timestamp" id="tsBtcPC">—</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Gold Options (COMEX)</div>
+                <div class="price-large" id="goldMaxPain">$-,---</div>
+                <div class="metric-row">
+                    <span class="metric-label">Gold Price</span>
+                    <span class="metric-value" id="goldCurrentPrice">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">P/C Ratio</span>
+                    <span class="metric-value" id="goldPCRatio">—</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Bias</span>
+                    <span class="metric-value" id="goldBias">—</span>
+                </div>
+                <div id="goldAnalysis" class="signal-box neutral">
+                    <div class="signal-title">Loading...</div>
+                    <div class="signal-desc">Analyzing gold options...</div>
+                </div>
+                <div class="card-timestamp" id="tsGold">—</div>
             </div>
         </div>
 
-        <!-- BTC Key Strike Levels -->
-        <div class="card">
-            <div class="card-title"><span class="icon">🎚️</span> BTC Key Strike Levels</div>
-            <div class="metric-small">Highest Open Interest Strikes</div>
-            <div id="btcStrikes" class="strike-table">
-                <div class="loading">Loading strike data...</div>
-            </div>
-        </div>
+        <!-- Key Strike Levels & Gamma -->
+        <div class="section">
+            <div class="section-title">BTC Options Structure</div>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Key Strike Levels (Highest OI)</div>
+                    <div id="btcStrikes">
+                        <div class="strike-row">
+                            <span class="metric-label">Loading strike data...</span>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- BTC Gamma Exposure -->
-        <div class="card">
-            <div class="card-title"><span class="icon">⚡</span> BTC Gamma Exposure</div>
-            <div class="metric-small">Market Maker Hedging Pressure</div>
-            <div id="btcGammaAnalysis" class="signal-box neutral">
-                <div class="signal-title">Loading...</div>
-                <div class="signal-desc">Calculating gamma...</div>
-            </div>
-            <div class="gamma-visual">
-                <span class="negative">Negative γ</span>
-                <div class="gamma-bar">
-                    <div id="btcGammaMarker" class="gamma-marker" style="left: 50%"></div>
+                <div class="card">
+                    <div class="card-title">Gamma Exposure</div>
+                    <div id="btcGammaAnalysis" class="signal-box neutral">
+                        <div class="signal-title">Loading...</div>
+                        <div class="signal-desc">Calculating gamma...</div>
+                    </div>
+                    <div class="gamma-visual">
+                        <span>Negative γ</span>
+                        <div class="gamma-bar">
+                            <div id="btcGammaMarker" class="gamma-marker" style="left: 50%"></div>
+                        </div>
+                        <span>Positive γ</span>
+                    </div>
+                    <div style="text-align: center; font-size: 0.75em; color: var(--text-tertiary); margin-top: 8px;">
+                        Negative = More volatility | Positive = Mean reversion
+                    </div>
                 </div>
-                <span class="positive">Positive γ</span>
-            </div>
-            <div class="metric-small" style="text-align: center; margin-top: 8px;">
-                Negative = More volatility | Positive = Mean reversion
-            </div>
-        </div>
 
-        <!-- Gold Options Overview -->
-        <div class="card">
-            <div class="card-title"><span class="icon">🥇</span> Gold Options (COMEX)</div>
-            <div id="goldMaxPain" class="metric-large neutral">--</div>
-            <div class="metric-small">Estimated Max Pain Level</div>
-            <div id="goldAnalysis" class="signal-box neutral">
-                <div class="signal-title">Loading...</div>
-                <div class="signal-desc">Analyzing gold options...</div>
-            </div>
-            <div class="key-levels">
-                <div class="level-box">
-                    <div class="level-label">Gold Price</div>
-                    <div id="goldCurrentPrice" class="level-value">--</div>
-                </div>
-                <div class="level-box">
-                    <div class="level-label">P/C Ratio</div>
-                    <div id="goldPCRatio" class="level-value">--</div>
-                </div>
-                <div class="level-box">
-                    <div class="level-label">Bias</div>
-                    <div id="goldBias" class="level-value">--</div>
+                <div class="card">
+                    <div class="card-title">Key Expiry Dates</div>
+                    <div id="expiryCalendar">
+                        <div class="strike-row">
+                            <span class="metric-label">Loading expiry data...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Price Impact Analysis -->
-        <div class="card full-width">
-            <div class="card-title"><span class="icon">🔮</span> Options Impact on Price</div>
-            <div class="time-horizon">
-                <div class="horizon-box">
-                    <div class="horizon-title">Short Term (1-7 days)</div>
-                    <div id="shortTermImpact">
-                        <div class="impact-item">
-                            <span>BTC Magnet Effect</span>
-                            <span id="btcMagnetShort" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Volatility Expectation</span>
-                            <span id="volExpectShort" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Dealer Hedging</span>
-                            <span id="hedgingShort" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Pin Risk</span>
-                            <span id="pinRiskShort" class="neutral">--</span>
-                        </div>
+        <div class="section">
+            <div class="section-title">Options Impact on Price</div>
+            <div class="impact-grid">
+                <div class="impact-section">
+                    <div class="impact-title">Short Term (1-7 days)</div>
+                    <div class="impact-item">
+                        <span>BTC Magnet Effect</span>
+                        <span id="btcMagnetShort" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Volatility Expectation</span>
+                        <span id="volExpectShort" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Dealer Hedging</span>
+                        <span id="hedgingShort" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Pin Risk</span>
+                        <span id="pinRiskShort" class="neutral">--</span>
                     </div>
                 </div>
-                <div class="horizon-box">
-                    <div class="horizon-title">Medium Term (1-4 weeks)</div>
-                    <div id="medTermImpact">
-                        <div class="impact-item">
-                            <span>Max Pain Gravity</span>
-                            <span id="mpGravityMed" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Large OI Clusters</span>
-                            <span id="oiClustersMed" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Roll Activity</span>
-                            <span id="rollActivity" class="neutral">--</span>
-                        </div>
-                        <div class="impact-item">
-                            <span>Positioning Shift</span>
-                            <span id="posShift" class="neutral">--</span>
-                        </div>
+                <div class="impact-section">
+                    <div class="impact-title">Medium Term (1-4 weeks)</div>
+                    <div class="impact-item">
+                        <span>Max Pain Gravity</span>
+                        <span id="mpGravityMed" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Large OI Clusters</span>
+                        <span id="oiClustersMed" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Roll Activity</span>
+                        <span id="rollActivity" class="neutral">--</span>
+                    </div>
+                    <div class="impact-item">
+                        <span>Positioning Shift</span>
+                        <span id="posShift" class="neutral">--</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TradingView Chart -->
-        <div class="card full-width">
-            <div class="card-title"><span class="icon">📈</span> BTC Options Sentiment Chart</div>
+        <!-- Options Signals -->
+        <div class="section">
+            <div class="section-title">Options-Based Signals</div>
+            <div id="optionsSignals" class="signal-box neutral">
+                <div class="signal-title">Loading signals...</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="section">
+            <div class="section-title">BTC Price Chart</div>
             <div class="chart-container">
-                <div id="tradingview-widget"></div>
+                <div class="chart-inner" id="tradingview_chart"></div>
             </div>
         </div>
 
-        <!-- Options Strategy Signals -->
-        <div class="card">
-            <div class="card-title"><span class="icon">🎲</span> Options-Based Signals</div>
-            <div id="optionsSignals">
-                <div class="signal-box neutral">
-                    <div class="signal-title">Loading signals...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Expiry Calendar -->
-        <div class="card">
-            <div class="card-title"><span class="icon">📅</span> Key Expiry Dates</div>
-            <div id="expiryCalendar">
-                <div class="loading">Loading expiry data...</div>
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <div class="disclaimer-title">Important Disclaimer</div>
+            <div class="disclaimer-text">
+                Options data is estimated based on market analysis and may not reflect exact exchange data.
+                Max pain calculations are theoretical and prices don't always converge to these levels.
+                This is not financial advice. Options trading involves significant risk of loss.
+                Always do your own research and consider consulting a financial advisor.
             </div>
         </div>
     </div>
 
-    <div class="disclaimer">
-        <div class="disclaimer-title">⚠️ Important Disclaimer</div>
-        <div class="disclaimer-text">
-            Options data is estimated based on market analysis and may not reflect exact exchange data.
-            Max pain calculations are theoretical and prices don't always converge to these levels.
-            This is not financial advice. Options trading involves significant risk of loss.
-            Always do your own research and consider consulting a financial advisor.
-        </div>
-    </div>
-
-    <div class="timestamp" id="lastUpdate">Last updated: --</div>
-
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // Market data storage
+        let currentTheme = localStorage.getItem('options-theme') || 'night';
+
         let marketData = {
             btc: {
                 price: 0,
@@ -661,7 +775,45 @@
             }
         };
 
-        // Fetch BTC price
+        function formatTimestamp() {
+            return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        }
+
+        function updateTimestamp(id) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = 'Updated: ' + formatTimestamp();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const button = document.querySelector('.theme-toggle');
+            if (currentTheme === 'day') {
+                html.removeAttribute('data-theme');
+                button.textContent = 'Day Mode';
+                currentTheme = 'night';
+            } else {
+                html.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+                currentTheme = 'day';
+            }
+            localStorage.setItem('options-theme', currentTheme);
+            initChart();
+        }
+
+        function toggleDropdown() {
+            document.getElementById('navDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.nav-dropdown-btn') && !event.target.closest('.nav-dropdown-btn')) {
+                const dropdowns = document.getElementsByClassName('nav-dropdown-content');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+
         async function fetchBTCPrice() {
             try {
                 const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
@@ -669,11 +821,10 @@
                 marketData.btc.price = parseFloat(data.price);
             } catch (e) {
                 console.error('Error fetching BTC price:', e);
-                marketData.btc.price = 102000; // Fallback
+                marketData.btc.price = 102000;
             }
         }
 
-        // Fetch Gold price (PAXG)
         async function fetchGoldPrice() {
             try {
                 const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
@@ -681,44 +832,31 @@
                 marketData.gold.price = parseFloat(data.price);
             } catch (e) {
                 console.error('Error fetching gold price:', e);
-                marketData.gold.price = 2750; // Fallback
+                marketData.gold.price = 2750;
             }
         }
 
-        // Estimate BTC options data (Deribit-style estimation)
         function estimateBTCOptions() {
             const price = marketData.btc.price;
-
-            // Round to nearest $5000 for max pain estimation
             const roundedPrice = Math.round(price / 5000) * 5000;
-
-            // Max pain typically slightly below current price in bull markets
-            // Slightly above in bear markets - using funding rate as proxy
-            const maxPainOffset = -2000; // Slight bearish bias typical for options
+            const maxPainOffset = -2000;
             marketData.btc.maxPain = roundedPrice + maxPainOffset;
 
-            // Estimate Put/Call ratio based on market conditions
-            // In bull markets: more calls (ratio < 1)
-            // In bear markets: more puts (ratio > 1)
             const priceVsRound = price / roundedPrice;
             if (priceVsRound > 1.02) {
-                // Price above round number - bullish, more calls
                 marketData.btc.pcRatio = 0.65 + Math.random() * 0.15;
                 marketData.btc.callOI = 60 + Math.random() * 10;
                 marketData.btc.putOI = 100 - marketData.btc.callOI;
             } else if (priceVsRound < 0.98) {
-                // Price below round number - bearish, more puts
                 marketData.btc.pcRatio = 0.95 + Math.random() * 0.25;
                 marketData.btc.callOI = 45 + Math.random() * 10;
                 marketData.btc.putOI = 100 - marketData.btc.callOI;
             } else {
-                // Neutral zone
                 marketData.btc.pcRatio = 0.75 + Math.random() * 0.2;
                 marketData.btc.callOI = 52 + Math.random() * 8;
                 marketData.btc.putOI = 100 - marketData.btc.callOI;
             }
 
-            // Generate top strikes
             const strikes = [];
             const baseStrike = Math.round(price / 5000) * 5000;
 
@@ -738,36 +876,28 @@
 
             marketData.btc.topStrikes = strikes.sort((a, b) => b.oi - a.oi).slice(0, 6);
 
-            // Calculate next Friday expiry (weekly options)
             const now = new Date();
             const daysUntilFriday = (5 - now.getDay() + 7) % 7 || 7;
             const nextFriday = new Date(now);
             nextFriday.setDate(now.getDate() + daysUntilFriday);
             marketData.btc.nextExpiry = nextFriday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-            // Estimate gamma based on price vs max pain
             const distanceToMP = (price - marketData.btc.maxPain) / marketData.btc.maxPain * 100;
             if (Math.abs(distanceToMP) < 2) {
-                marketData.btc.gamma = 'positive'; // Near max pain = positive gamma
+                marketData.btc.gamma = 'positive';
             } else if (Math.abs(distanceToMP) > 5) {
-                marketData.btc.gamma = 'negative'; // Far from max pain = negative gamma
+                marketData.btc.gamma = 'negative';
             } else {
                 marketData.btc.gamma = 'neutral';
             }
         }
 
-        // Estimate Gold options data
         function estimateGoldOptions() {
             const price = marketData.gold.price;
-
-            // Gold max pain typically near round $50 levels
             const roundedPrice = Math.round(price / 50) * 50;
             marketData.gold.maxPain = roundedPrice;
-
-            // Gold options typically have higher put/call ratio (hedging)
             marketData.gold.pcRatio = 0.85 + Math.random() * 0.3;
 
-            // Determine bias
             if (price > marketData.gold.maxPain * 1.02) {
                 marketData.gold.bias = 'bullish';
             } else if (price < marketData.gold.maxPain * 0.98) {
@@ -777,7 +907,6 @@
             }
         }
 
-        // Update UI
         function updateUI() {
             const btc = marketData.btc;
             const gold = marketData.gold;
@@ -790,29 +919,29 @@
             const mpDistance = ((btc.price - btc.maxPain) / btc.maxPain * 100).toFixed(1);
             const mpDistEl = document.getElementById('btcMaxPainDist');
             mpDistEl.textContent = (mpDistance > 0 ? '+' : '') + mpDistance + '%';
-            mpDistEl.className = 'level-value ' + (mpDistance > 0 ? 'positive' : mpDistance < 0 ? 'negative' : 'neutral');
+            mpDistEl.className = 'metric-value ' + (mpDistance > 0 ? 'positive' : mpDistance < 0 ? 'negative' : 'neutral');
 
-            // Max Pain Analysis
             const mpAnalysis = document.getElementById('btcMaxPainAnalysis');
             if (Math.abs(mpDistance) < 2) {
                 mpAnalysis.className = 'signal-box neutral';
                 mpAnalysis.innerHTML = `
-                    <div class="signal-title neutral">Price Near Max Pain</div>
-                    <div class="signal-desc">Price is close to max pain level. Expect range-bound action as price gravitates toward this level near expiry. Low volatility environment likely.</div>
+                    <div class="signal-title">Price Near Max Pain</div>
+                    <div class="signal-desc">Price is close to max pain level. Expect range-bound action as price gravitates toward this level near expiry.</div>
                 `;
             } else if (mpDistance > 0) {
                 mpAnalysis.className = 'signal-box bullish';
                 mpAnalysis.innerHTML = `
-                    <div class="signal-title bullish">Price Above Max Pain</div>
-                    <div class="signal-desc">Calls are in profit. If momentum continues, dealers may need to buy more BTC to hedge (gamma squeeze potential). Watch for pullback toward $${btc.maxPain.toLocaleString()} near expiry.</div>
+                    <div class="signal-title">Price Above Max Pain</div>
+                    <div class="signal-desc">Calls are in profit. Dealers may need to buy more BTC to hedge (gamma squeeze potential). Watch for pullback toward $${btc.maxPain.toLocaleString()} near expiry.</div>
                 `;
             } else {
                 mpAnalysis.className = 'signal-box bearish';
                 mpAnalysis.innerHTML = `
-                    <div class="signal-title bearish">Price Below Max Pain</div>
+                    <div class="signal-title">Price Below Max Pain</div>
                     <div class="signal-desc">Puts are in profit. Downside pressure from delta hedging. Watch for bounce toward $${btc.maxPain.toLocaleString()} as expiry approaches.</div>
                 `;
             }
+            updateTimestamp('tsBtcMP');
 
             // Put/Call Ratio
             document.getElementById('btcPCRatio').textContent = btc.pcRatio.toFixed(2);
@@ -828,22 +957,23 @@
             if (btc.pcRatio < 0.7) {
                 pcAnalysis.className = 'signal-box bullish';
                 pcAnalysis.innerHTML = `
-                    <div class="signal-title bullish">Strong Call Dominance</div>
-                    <div class="signal-desc">Heavy call buying indicates bullish sentiment. Potential for gamma squeeze if price breaks above key strikes. Contrarian view: may be overcrowded long.</div>
+                    <div class="signal-title">Strong Call Dominance</div>
+                    <div class="signal-desc">Heavy call buying indicates bullish sentiment. Potential for gamma squeeze if price breaks above key strikes.</div>
                 `;
             } else if (btc.pcRatio > 1.0) {
                 pcAnalysis.className = 'signal-box bearish';
                 pcAnalysis.innerHTML = `
-                    <div class="signal-title bearish">Put Heavy Market</div>
-                    <div class="signal-desc">More puts than calls suggests hedging or bearish bets. Could act as support if puts expire worthless. Watch for short squeeze potential.</div>
+                    <div class="signal-title">Put Heavy Market</div>
+                    <div class="signal-desc">More puts than calls suggests hedging or bearish bets. Could act as support if puts expire worthless.</div>
                 `;
             } else {
                 pcAnalysis.className = 'signal-box neutral';
                 pcAnalysis.innerHTML = `
-                    <div class="signal-title neutral">Balanced Positioning</div>
-                    <div class="signal-desc">Market is relatively balanced between calls and puts. No extreme sentiment detected. Price likely to follow underlying trends.</div>
+                    <div class="signal-title">Balanced Positioning</div>
+                    <div class="signal-desc">Market is relatively balanced between calls and puts. No extreme sentiment detected.</div>
                 `;
             }
+            updateTimestamp('tsBtcPC');
 
             // Strike Levels
             const strikesHtml = btc.topStrikes.map(s => `
@@ -854,7 +984,7 @@
                         <div class="oi-visual">
                             <div class="oi-fill ${s.type}" style="width: ${s.oi}%"></div>
                         </div>
-                        <span>${s.oi.toFixed(0)}%</span>
+                        <span style="font-size: 0.8em">${s.oi.toFixed(0)}%</span>
                     </div>
                 </div>
             `).join('');
@@ -868,22 +998,22 @@
                 gammaMarker.style.left = '75%';
                 gammaAnalysis.className = 'signal-box bullish';
                 gammaAnalysis.innerHTML = `
-                    <div class="signal-title bullish">Positive Gamma Environment</div>
-                    <div class="signal-desc">Dealers are long gamma. They sell rallies and buy dips, creating mean reversion. Expect lower volatility and price stability near current levels.</div>
+                    <div class="signal-title">Positive Gamma Environment</div>
+                    <div class="signal-desc">Dealers are long gamma. They sell rallies and buy dips, creating mean reversion. Expect lower volatility.</div>
                 `;
             } else if (btc.gamma === 'negative') {
                 gammaMarker.style.left = '25%';
                 gammaAnalysis.className = 'signal-box bearish';
                 gammaAnalysis.innerHTML = `
-                    <div class="signal-title bearish">Negative Gamma Environment</div>
-                    <div class="signal-desc">Dealers are short gamma. They buy rallies and sell dips, amplifying moves. Expect higher volatility and potential for sharp directional moves.</div>
+                    <div class="signal-title">Negative Gamma Environment</div>
+                    <div class="signal-desc">Dealers are short gamma. They buy rallies and sell dips, amplifying moves. Expect higher volatility.</div>
                 `;
             } else {
                 gammaMarker.style.left = '50%';
                 gammaAnalysis.className = 'signal-box neutral';
                 gammaAnalysis.innerHTML = `
-                    <div class="signal-title neutral">Neutral Gamma</div>
-                    <div class="signal-desc">Gamma exposure is balanced. Market dynamics will be driven more by directional flows than options hedging.</div>
+                    <div class="signal-title">Neutral Gamma</div>
+                    <div class="signal-desc">Gamma exposure is balanced. Market dynamics will be driven more by directional flows.</div>
                 `;
             }
 
@@ -894,33 +1024,33 @@
 
             const goldBiasEl = document.getElementById('goldBias');
             goldBiasEl.textContent = gold.bias.charAt(0).toUpperCase() + gold.bias.slice(1);
-            goldBiasEl.className = 'level-value ' + gold.bias;
+            goldBiasEl.className = 'metric-value ' + (gold.bias === 'bullish' ? 'positive' : gold.bias === 'bearish' ? 'negative' : 'neutral');
 
             const goldAnalysis = document.getElementById('goldAnalysis');
             if (gold.bias === 'bullish') {
                 goldAnalysis.className = 'signal-box bullish';
                 goldAnalysis.innerHTML = `
-                    <div class="signal-title bullish">Gold Above Max Pain</div>
-                    <div class="signal-desc">Gold trading above options max pain. Call holders in profit. Watch for potential pullback toward $${gold.maxPain.toLocaleString()} near monthly expiry.</div>
+                    <div class="signal-title">Gold Above Max Pain</div>
+                    <div class="signal-desc">Gold trading above options max pain. Call holders in profit. Watch for potential pullback toward $${gold.maxPain.toLocaleString()}.</div>
                 `;
             } else if (gold.bias === 'bearish') {
                 goldAnalysis.className = 'signal-box bearish';
                 goldAnalysis.innerHTML = `
-                    <div class="signal-title bearish">Gold Below Max Pain</div>
+                    <div class="signal-title">Gold Below Max Pain</div>
                     <div class="signal-desc">Gold trading below options max pain. Put holders in profit. Potential support from put sellers near $${gold.maxPain.toLocaleString()}.</div>
                 `;
             } else {
                 goldAnalysis.className = 'signal-box neutral';
                 goldAnalysis.innerHTML = `
-                    <div class="signal-title neutral">Gold Near Max Pain</div>
-                    <div class="signal-desc">Gold hovering around options max pain level. Expect consolidation as both call and put sellers have interest in keeping price near $${gold.maxPain.toLocaleString()}.</div>
+                    <div class="signal-title">Gold Near Max Pain</div>
+                    <div class="signal-desc">Gold hovering around options max pain level. Expect consolidation near $${gold.maxPain.toLocaleString()}.</div>
                 `;
             }
+            updateTimestamp('tsGold');
 
             // Price Impact Analysis
             const mpDistAbs = Math.abs(parseFloat(mpDistance));
 
-            // Short term impacts
             document.getElementById('btcMagnetShort').textContent = mpDistAbs < 3 ? 'Strong' : mpDistAbs < 5 ? 'Moderate' : 'Weak';
             document.getElementById('btcMagnetShort').className = mpDistAbs < 3 ? 'positive' : mpDistAbs < 5 ? 'neutral' : 'negative';
 
@@ -933,8 +1063,7 @@
             document.getElementById('pinRiskShort').textContent = mpDistAbs < 2 ? 'High' : mpDistAbs < 4 ? 'Medium' : 'Low';
             document.getElementById('pinRiskShort').className = mpDistAbs < 2 ? 'neutral' : 'positive';
 
-            // Medium term impacts
-            document.getElementById('mpGravityMed').textContent = mpDistAbs > 5 ? 'Strong pull expected' : 'Weak pull';
+            document.getElementById('mpGravityMed').textContent = mpDistAbs > 5 ? 'Strong pull' : 'Weak pull';
             document.getElementById('mpGravityMed').className = mpDistAbs > 5 ? 'neutral' : 'positive';
 
             document.getElementById('oiClustersMed').textContent = `$${(btc.maxPain - 5000).toLocaleString()} - $${(btc.maxPain + 5000).toLocaleString()}`;
@@ -947,57 +1076,44 @@
             document.getElementById('posShift').className = btc.pcRatio < 0.8 ? 'positive' : btc.pcRatio > 1 ? 'negative' : 'neutral';
 
             // Options Signals
-            let signalClass = 'neutral';
-            let signalHtml = '';
+            const signalsEl = document.getElementById('optionsSignals');
 
             if (btc.gamma === 'negative' && mpDistance > 3) {
-                signalClass = 'bullish';
-                signalHtml = `
-                    <div class="signal-box bullish">
-                        <div class="signal-title">Gamma Squeeze Setup</div>
-                        <div class="signal-desc">Negative gamma + price above max pain = potential for accelerated upside if key strikes break.</div>
-                    </div>
+                signalsEl.className = 'signal-box bullish';
+                signalsEl.innerHTML = `
+                    <div class="signal-title">Gamma Squeeze Setup</div>
+                    <div class="signal-desc">Negative gamma + price above max pain = potential for accelerated upside if key strikes break.</div>
                 `;
             } else if (btc.gamma === 'negative' && mpDistance < -3) {
-                signalClass = 'bearish';
-                signalHtml = `
-                    <div class="signal-box bearish">
-                        <div class="signal-title">Downside Acceleration Risk</div>
-                        <div class="signal-desc">Negative gamma + price below max pain = hedging flows could amplify selling.</div>
-                    </div>
+                signalsEl.className = 'signal-box bearish';
+                signalsEl.innerHTML = `
+                    <div class="signal-title">Downside Acceleration Risk</div>
+                    <div class="signal-desc">Negative gamma + price below max pain = hedging flows could amplify selling.</div>
                 `;
             } else if (btc.pcRatio < 0.65) {
-                signalClass = 'neutral';
-                signalHtml = `
-                    <div class="signal-box neutral">
-                        <div class="signal-title">Extreme Call Skew - Contrarian Alert</div>
-                        <div class="signal-desc">Very high call/put ratio often precedes pullbacks. Consider taking profits on longs.</div>
-                    </div>
+                signalsEl.className = 'signal-box neutral';
+                signalsEl.innerHTML = `
+                    <div class="signal-title">Extreme Call Skew - Contrarian Alert</div>
+                    <div class="signal-desc">Very high call/put ratio often precedes pullbacks. Consider taking profits on longs.</div>
                 `;
             } else if (btc.pcRatio > 1.2) {
-                signalClass = 'bullish';
-                signalHtml = `
-                    <div class="signal-box bullish">
-                        <div class="signal-title">Put Wall Protection</div>
-                        <div class="signal-desc">Heavy put OI below price creates support. Put sellers will defend these levels.</div>
-                    </div>
+                signalsEl.className = 'signal-box bullish';
+                signalsEl.innerHTML = `
+                    <div class="signal-title">Put Wall Protection</div>
+                    <div class="signal-desc">Heavy put OI below price creates support. Put sellers will defend these levels.</div>
                 `;
             } else {
-                signalHtml = `
-                    <div class="signal-box neutral">
-                        <div class="signal-title">No Strong Options Signal</div>
-                        <div class="signal-desc">Options positioning is balanced. Trade based on technical and fundamental factors.</div>
-                    </div>
+                signalsEl.className = 'signal-box neutral';
+                signalsEl.innerHTML = `
+                    <div class="signal-title">No Strong Options Signal</div>
+                    <div class="signal-desc">Options positioning is balanced. Trade based on technical and fundamental factors.</div>
                 `;
             }
-
-            document.getElementById('optionsSignals').innerHTML = signalHtml;
 
             // Expiry Calendar
             const now = new Date();
             const expiries = [];
 
-            // Weekly expiries (Fridays)
             for (let i = 0; i < 4; i++) {
                 const daysUntil = ((5 - now.getDay() + 7) % 7 || 7) + (i * 7);
                 const expDate = new Date(now);
@@ -1009,7 +1125,6 @@
                 });
             }
 
-            // Monthly expiry (last Friday of month)
             const lastFriday = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             while (lastFriday.getDay() !== 5) {
                 lastFriday.setDate(lastFriday.getDate() - 1);
@@ -1027,100 +1142,89 @@
             const expiryHtml = expiries.slice(0, 5).map(e => `
                 <div class="strike-row">
                     <span class="${e.importance === 'high' ? 'neutral' : ''}">${e.date}</span>
-                    <span class="metric-small">${e.type}</span>
+                    <span style="font-size: 0.8em; color: var(--text-tertiary)">${e.type}</span>
                 </div>
             `).join('');
 
             document.getElementById('expiryCalendar').innerHTML = expiryHtml;
 
-            // Overall Verdict
-            const verdict = document.getElementById('overallVerdict');
-            let verdictClass = 'neutral';
-            let verdictTitle = '';
-            let verdictDesc = '';
+            // Verdict Banner
+            const banner = document.getElementById('verdictBanner');
+            const icon = document.getElementById('verdictIcon');
+            const title = document.getElementById('verdictTitle');
+            const desc = document.getElementById('verdictDescription');
+
+            banner.classList.remove('bullish', 'bearish', 'neutral-verdict');
 
             const bullishFactors = (btc.pcRatio < 0.8 ? 1 : 0) + (mpDistance > 2 ? 1 : 0) + (btc.gamma === 'positive' ? 1 : 0);
             const bearishFactors = (btc.pcRatio > 1 ? 1 : 0) + (mpDistance < -2 ? 1 : 0) + (btc.gamma === 'negative' && mpDistance < 0 ? 1 : 0);
 
             if (bullishFactors >= 2) {
-                verdictClass = 'bullish';
-                verdictTitle = 'Options Flow: BULLISH';
-                verdictDesc = 'Call dominance, positive gamma, and price above max pain suggest upside bias. Watch for gamma squeeze opportunities.';
+                banner.classList.add('bullish');
+                icon.textContent = '📈';
+                title.textContent = 'Options Flow: BULLISH';
+                desc.textContent = 'Call dominance, positive gamma, and price above max pain suggest upside bias. Watch for gamma squeeze opportunities.';
             } else if (bearishFactors >= 2) {
-                verdictClass = 'bearish';
-                verdictTitle = 'Options Flow: BEARISH';
-                verdictDesc = 'Put heavy positioning with price below max pain. Hedging pressure may amplify downside moves.';
+                banner.classList.add('bearish');
+                icon.textContent = '📉';
+                title.textContent = 'Options Flow: BEARISH';
+                desc.textContent = 'Put heavy positioning with price below max pain. Hedging pressure may amplify downside moves.';
             } else {
-                verdictClass = 'neutral';
-                verdictTitle = 'Options Flow: NEUTRAL';
-                verdictDesc = 'Mixed signals from options market. No clear directional bias. Follow price action and spot market trends.';
+                banner.classList.add('neutral-verdict');
+                icon.textContent = '⚖️';
+                title.textContent = 'Options Flow: NEUTRAL';
+                desc.textContent = 'Mixed signals from options market. No clear directional bias. Follow price action and spot market trends.';
             }
 
-            verdict.className = 'verdict-box ' + verdictClass;
-            verdict.innerHTML = `
-                <div class="verdict-title ${verdictClass}">${verdictTitle}</div>
-                <div class="verdict-subtitle">${verdictDesc}</div>
-            `;
-
-            // Update timestamp
-            document.getElementById('lastUpdate').textContent = 'Last updated: ' + new Date().toLocaleString();
+            // Update main timestamp
+            document.getElementById('lastUpdate').textContent =
+                'Last update: ' + new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC • Auto-refresh: 60s';
         }
 
-        // Initialize TradingView widget
         function initChart() {
-            const container = document.getElementById('tradingview-widget');
+            const container = document.getElementById('tradingview_chart');
+            if (!container) return;
             container.innerHTML = '';
 
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-            script.async = true;
-            script.innerHTML = JSON.stringify({
+            const isDark = currentTheme === 'night';
+
+            new TradingView.widget({
                 "autosize": true,
                 "symbol": "BINANCE:BTCUSDT",
                 "interval": "D",
                 "timezone": "Etc/UTC",
-                "theme": "dark",
+                "theme": isDark ? "dark" : "light",
                 "style": "1",
                 "locale": "en",
-                "backgroundColor": "rgba(15, 15, 35, 1)",
-                "gridColor": "rgba(255, 255, 255, 0.06)",
-                "withdateranges": true,
+                "toolbar_bg": isDark ? "#0a0a0a" : "#fafafa",
+                "enable_publishing": false,
                 "hide_side_toolbar": false,
                 "allow_symbol_change": true,
-                "studies": [
-                    "Volume@tv-basicstudies"
-                ],
-                "support_host": "https://www.tradingview.com"
+                "container_id": "tradingview_chart",
+                "hide_top_toolbar": false,
+                "save_image": false,
+                "backgroundColor": isDark ? "#0a0a0a" : "#ffffff",
+                "gridColor": isDark ? "#1a1a1a" : "#e5e5e5"
             });
-
-            container.appendChild(script);
         }
 
-        // Main initialization
-        async function init() {
-            await Promise.all([
-                fetchBTCPrice(),
-                fetchGoldPrice()
-            ]);
-
+        async function fetchAllData() {
+            await Promise.all([fetchBTCPrice(), fetchGoldPrice()]);
             estimateBTCOptions();
             estimateGoldOptions();
             updateUI();
-            initChart();
-
-            // Refresh every 60 seconds
-            setInterval(async () => {
-                await Promise.all([
-                    fetchBTCPrice(),
-                    fetchGoldPrice()
-                ]);
-                estimateBTCOptions();
-                estimateGoldOptions();
-                updateUI();
-            }, 60000);
         }
 
-        init();
+        window.addEventListener('DOMContentLoaded', () => {
+            const button = document.querySelector('.theme-toggle');
+            if (currentTheme === 'day') {
+                document.documentElement.setAttribute('data-theme', 'day');
+                button.textContent = 'Night Mode';
+            }
+            fetchAllData();
+            initChart();
+            setInterval(fetchAllData, 60000);
+        });
     </script>
 </body>
 </html>
