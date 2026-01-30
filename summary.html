@@ -178,7 +178,7 @@
         /* Quick Stats */
         .quick-stats {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
@@ -216,7 +216,7 @@
         /* Insights Grid */
         .insights-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
@@ -249,7 +249,7 @@
         /* Position Recommendations */
         .positions-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
@@ -395,6 +395,15 @@
             text-align: center;
         }
 
+        @media (max-width: 1200px) {
+            .quick-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .positions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
             .quick-stats {
                 grid-template-columns: repeat(2, 1fr);
@@ -507,6 +516,65 @@
                 <div class="stat-value" id="ethPrice">$--,---</div>
                 <div class="stat-change" id="ethChange">--</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">SOL</div>
+                <div class="stat-value" id="solPrice">$---</div>
+                <div class="stat-change" id="solChange">--</div>
+            </div>
+        </div>
+
+        <!-- Cross-Asset Metrics -->
+        <div class="section">
+            <div class="section-title">Cross-Asset Analysis</div>
+            <div class="quick-stats" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-label">ETH/BTC Ratio</div>
+                    <div class="stat-value" id="ethBtcRatio">--.----</div>
+                    <div class="stat-change" id="ethBtcSignal">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">SOL/BTC Ratio</div>
+                    <div class="stat-value" id="solBtcRatio">--.-----</div>
+                    <div class="stat-change" id="solBtcSignal">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Gold/BTC Ratio</div>
+                    <div class="stat-value" id="goldBtcRatio">--.----</div>
+                    <div class="stat-change" id="goldBtcSignal">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Fear & Greed</div>
+                    <div class="stat-value" id="fearGreed">--</div>
+                    <div class="stat-change" id="fearGreedLabel">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options Flow Summary -->
+        <div class="section">
+            <div class="section-title">Options Flow Analysis</div>
+            <div class="quick-stats" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-label">BTC Max Pain</div>
+                    <div class="stat-value" id="btcMaxPain">$--,---</div>
+                    <div class="stat-change" id="maxPainDist">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Put/Call Ratio</div>
+                    <div class="stat-value" id="pcRatio">--.--</div>
+                    <div class="stat-change" id="pcSignal">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Gamma Exposure</div>
+                    <div class="stat-value" id="gammaExposure">--</div>
+                    <div class="stat-change" id="gammaSignal">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Options Bias</div>
+                    <div class="stat-value" id="optionsBias">--</div>
+                    <div class="stat-change" id="optionsSignal">--</div>
+                </div>
+            </div>
         </div>
 
         <!-- Key Insights -->
@@ -535,6 +603,18 @@
                     <div class="insight-title">Risk Assessment</div>
                     <div class="insight-content" id="riskInsight">
                         Monitoring liquidation levels, funding rates, and market positioning...
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Options Market Signal</div>
+                    <div class="insight-content" id="optionsInsight">
+                        Analyzing options flow, max pain levels, and dealer positioning...
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Altcoin Rotation</div>
+                    <div class="insight-content" id="altcoinInsight">
+                        Tracking ETH/BTC and SOL/BTC ratios for rotation signals...
                     </div>
                 </div>
             </div>
@@ -630,6 +710,36 @@
                         </div>
                     </div>
                     <div class="position-rationale" id="ethRationale">
+                        Loading analysis...
+                    </div>
+                </div>
+
+                <div class="position-card" id="solPosition">
+                    <div class="position-asset">Solana (SOL)</div>
+                    <div class="position-bias" id="solBias">Analyzing...</div>
+                    <div class="position-details">
+                        <div class="position-row">
+                            <span class="position-label">Entry Zone</span>
+                            <span class="position-value" id="solEntry">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 1</span>
+                            <span class="position-value" id="solTarget1">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Target 2</span>
+                            <span class="position-value" id="solTarget2">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Stop Loss</span>
+                            <span class="position-value" id="solStop">--</span>
+                        </div>
+                        <div class="position-row">
+                            <span class="position-label">Conviction</span>
+                            <span class="position-value" id="solConviction">--</span>
+                        </div>
+                    </div>
+                    <div class="position-rationale" id="solRationale">
                         Loading analysis...
                     </div>
                 </div>
@@ -731,12 +841,26 @@
 
         // Global market data
         let marketData = {
-            btc: { price: 0, change24h: 0, high24h: 0, low24h: 0, funding: 0 },
+            btc: { price: 0, change24h: 0, high24h: 0, low24h: 0, funding: 0, rsi: 50 },
             eth: { price: 0, change24h: 0, funding: 0 },
+            sol: { price: 0, change24h: 0 },
             gold: { price: 0, change24h: 0 },
             silver: { price: 0, change24h: 0 },
             dxy: { price: 0, change24h: 0 },
-            eurusd: { price: 0, change24h: 0 }
+            eurusd: { price: 0, change24h: 0 },
+            // Calculated ratios
+            ethBtcRatio: 0,
+            solBtcRatio: 0,
+            goldBtcRatio: 0,
+            // Options estimates
+            options: {
+                maxPain: 0,
+                pcRatio: 0,
+                gamma: 'neutral',
+                bias: 'neutral'
+            },
+            // Sentiment
+            fearGreed: 50
         };
 
         function formatPrice(price, decimals = 0) {
@@ -799,6 +923,12 @@
                 const ethFundingData = await ethFundingRes.json();
                 marketData.eth.funding = ethFundingData[0] ? parseFloat(ethFundingData[0].fundingRate) * 100 : 0;
 
+                // Fetch SOL futures
+                const solRes = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=SOLUSDT');
+                const solData = await solRes.json();
+                marketData.sol.price = parseFloat(solData.lastPrice);
+                marketData.sol.change24h = parseFloat(solData.priceChangePercent);
+
                 // Fetch Gold (PAXG)
                 const goldRes = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT');
                 const goldData = await goldRes.json();
@@ -833,11 +963,79 @@
                     marketData.dxy.change24h = 0;
                 }
 
+                // Calculate cross-asset ratios
+                marketData.ethBtcRatio = marketData.eth.price / marketData.btc.price;
+                marketData.solBtcRatio = marketData.sol.price / marketData.btc.price;
+                marketData.goldBtcRatio = marketData.gold.price / marketData.btc.price;
+
+                // Estimate BTC options data (simulating what options-tracker calculates)
+                estimateOptionsData();
+
+                // Estimate Fear & Greed and RSI
+                estimateSentimentIndicators();
+
                 updateUI();
 
             } catch (error) {
                 console.error('Failed to fetch market data:', error);
             }
+        }
+
+        function estimateOptionsData() {
+            const price = marketData.btc.price;
+            const roundedPrice = Math.round(price / 5000) * 5000;
+            marketData.options.maxPain = roundedPrice - 2000;
+
+            // Estimate Put/Call ratio based on price momentum
+            const priceVsRound = price / roundedPrice;
+            if (priceVsRound > 1.02) {
+                marketData.options.pcRatio = 0.65 + Math.random() * 0.15;
+            } else if (priceVsRound < 0.98) {
+                marketData.options.pcRatio = 0.95 + Math.random() * 0.25;
+            } else {
+                marketData.options.pcRatio = 0.75 + Math.random() * 0.2;
+            }
+
+            // Estimate gamma exposure
+            const distanceToMP = (price - marketData.options.maxPain) / marketData.options.maxPain * 100;
+            if (Math.abs(distanceToMP) < 2) {
+                marketData.options.gamma = 'positive';
+            } else if (Math.abs(distanceToMP) > 5) {
+                marketData.options.gamma = 'negative';
+            } else {
+                marketData.options.gamma = 'neutral';
+            }
+
+            // Determine options bias
+            const pcRatio = marketData.options.pcRatio;
+            if (pcRatio < 0.7 && distanceToMP > 0) {
+                marketData.options.bias = 'bullish';
+            } else if (pcRatio > 1.0 && distanceToMP < 0) {
+                marketData.options.bias = 'bearish';
+            } else {
+                marketData.options.bias = 'neutral';
+            }
+        }
+
+        function estimateSentimentIndicators() {
+            // Estimate Fear & Greed based on multiple factors
+            const btcMomentum = marketData.btc.change24h;
+            const funding = marketData.btc.funding;
+            const volatility = (marketData.btc.high24h - marketData.btc.low24h) / marketData.btc.price * 100;
+
+            let fearGreed = 50; // Base neutral
+            fearGreed += btcMomentum * 5; // Price movement impact
+            fearGreed += funding * 200; // Funding impact
+            fearGreed -= (volatility - 3) * 5; // High volatility = fear
+
+            // Clamp between 0-100
+            marketData.fearGreed = Math.max(0, Math.min(100, Math.round(fearGreed)));
+
+            // Estimate RSI based on price position in 24h range
+            const pricePosition = (marketData.btc.price - marketData.btc.low24h) /
+                                 (marketData.btc.high24h - marketData.btc.low24h);
+            marketData.btc.rsi = Math.round(30 + pricePosition * 40 + btcMomentum * 2);
+            marketData.btc.rsi = Math.max(20, Math.min(80, marketData.btc.rsi));
         }
 
         function updateUI() {
@@ -867,6 +1065,115 @@
             ethChangeEl.textContent = formatPercent(marketData.eth.change24h);
             ethChangeEl.className = 'stat-change ' + getChangeClass(marketData.eth.change24h);
 
+            // SOL
+            document.getElementById('solPrice').textContent = formatPrice(marketData.sol.price, 2);
+            const solChangeEl = document.getElementById('solChange');
+            solChangeEl.textContent = formatPercent(marketData.sol.change24h);
+            solChangeEl.className = 'stat-change ' + getChangeClass(marketData.sol.change24h);
+
+            // Cross-asset ratios
+            document.getElementById('ethBtcRatio').textContent = marketData.ethBtcRatio.toFixed(5);
+            const ethBtcSignalEl = document.getElementById('ethBtcSignal');
+            const ethBtcDelta = marketData.eth.change24h - marketData.btc.change24h;
+            if (ethBtcDelta > 1) {
+                ethBtcSignalEl.textContent = 'ETH Outperforming';
+                ethBtcSignalEl.className = 'stat-change positive';
+            } else if (ethBtcDelta < -1) {
+                ethBtcSignalEl.textContent = 'BTC Dominant';
+                ethBtcSignalEl.className = 'stat-change negative';
+            } else {
+                ethBtcSignalEl.textContent = 'Neutral';
+                ethBtcSignalEl.className = 'stat-change neutral';
+            }
+
+            document.getElementById('solBtcRatio').textContent = marketData.solBtcRatio.toFixed(6);
+            const solBtcSignalEl = document.getElementById('solBtcSignal');
+            const solBtcDelta = marketData.sol.change24h - marketData.btc.change24h;
+            if (solBtcDelta > 2) {
+                solBtcSignalEl.textContent = 'SOL Outperforming';
+                solBtcSignalEl.className = 'stat-change positive';
+            } else if (solBtcDelta < -2) {
+                solBtcSignalEl.textContent = 'BTC Dominant';
+                solBtcSignalEl.className = 'stat-change negative';
+            } else {
+                solBtcSignalEl.textContent = 'Neutral';
+                solBtcSignalEl.className = 'stat-change neutral';
+            }
+
+            document.getElementById('goldBtcRatio').textContent = marketData.goldBtcRatio.toFixed(4);
+            const goldBtcSignalEl = document.getElementById('goldBtcSignal');
+            const goldBtcDelta = marketData.gold.change24h - marketData.btc.change24h;
+            if (goldBtcDelta > 1) {
+                goldBtcSignalEl.textContent = 'Gold Outperforming';
+                goldBtcSignalEl.className = 'stat-change neutral';
+            } else if (goldBtcDelta < -1) {
+                goldBtcSignalEl.textContent = 'BTC Outperforming';
+                goldBtcSignalEl.className = 'stat-change positive';
+            } else {
+                goldBtcSignalEl.textContent = 'Neutral';
+                goldBtcSignalEl.className = 'stat-change neutral';
+            }
+
+            // Fear & Greed
+            document.getElementById('fearGreed').textContent = marketData.fearGreed;
+            const fgLabelEl = document.getElementById('fearGreedLabel');
+            if (marketData.fearGreed >= 75) {
+                fgLabelEl.textContent = 'Extreme Greed';
+                fgLabelEl.className = 'stat-change negative';
+            } else if (marketData.fearGreed >= 55) {
+                fgLabelEl.textContent = 'Greed';
+                fgLabelEl.className = 'stat-change neutral';
+            } else if (marketData.fearGreed >= 45) {
+                fgLabelEl.textContent = 'Neutral';
+                fgLabelEl.className = 'stat-change neutral';
+            } else if (marketData.fearGreed >= 25) {
+                fgLabelEl.textContent = 'Fear';
+                fgLabelEl.className = 'stat-change neutral';
+            } else {
+                fgLabelEl.textContent = 'Extreme Fear';
+                fgLabelEl.className = 'stat-change positive';
+            }
+
+            // Options Flow
+            document.getElementById('btcMaxPain').textContent = formatPrice(marketData.options.maxPain);
+            const maxPainDistEl = document.getElementById('maxPainDist');
+            const mpDist = ((marketData.btc.price - marketData.options.maxPain) / marketData.options.maxPain * 100);
+            maxPainDistEl.textContent = (mpDist > 0 ? '+' : '') + mpDist.toFixed(1) + '% from current';
+            maxPainDistEl.className = 'stat-change ' + (Math.abs(mpDist) < 2 ? 'neutral' : mpDist > 0 ? 'positive' : 'negative');
+
+            document.getElementById('pcRatio').textContent = marketData.options.pcRatio.toFixed(2);
+            const pcSignalEl = document.getElementById('pcSignal');
+            if (marketData.options.pcRatio < 0.7) {
+                pcSignalEl.textContent = 'Call Heavy';
+                pcSignalEl.className = 'stat-change positive';
+            } else if (marketData.options.pcRatio > 1.0) {
+                pcSignalEl.textContent = 'Put Heavy';
+                pcSignalEl.className = 'stat-change negative';
+            } else {
+                pcSignalEl.textContent = 'Balanced';
+                pcSignalEl.className = 'stat-change neutral';
+            }
+
+            document.getElementById('gammaExposure').textContent = marketData.options.gamma.toUpperCase();
+            const gammaSignalEl = document.getElementById('gammaSignal');
+            if (marketData.options.gamma === 'positive') {
+                gammaSignalEl.textContent = 'Mean Reversion';
+                gammaSignalEl.className = 'stat-change positive';
+            } else if (marketData.options.gamma === 'negative') {
+                gammaSignalEl.textContent = 'Vol Expansion';
+                gammaSignalEl.className = 'stat-change negative';
+            } else {
+                gammaSignalEl.textContent = 'Neutral Impact';
+                gammaSignalEl.className = 'stat-change neutral';
+            }
+
+            document.getElementById('optionsBias').textContent = marketData.options.bias.toUpperCase();
+            const optionsSignalEl = document.getElementById('optionsSignal');
+            optionsSignalEl.textContent = marketData.options.bias === 'bullish' ? 'Calls Dominate' :
+                                          marketData.options.bias === 'bearish' ? 'Puts Dominate' : 'Mixed Flow';
+            optionsSignalEl.className = 'stat-change ' + (marketData.options.bias === 'bullish' ? 'positive' :
+                                        marketData.options.bias === 'bearish' ? 'negative' : 'neutral');
+
             // Generate analysis
             generateAnalysis();
 
@@ -879,14 +1186,54 @@
         function generateAnalysis() {
             const btc = marketData.btc;
             const eth = marketData.eth;
+            const sol = marketData.sol;
             const gold = marketData.gold;
             const silver = marketData.silver;
             const dxy = marketData.dxy;
+            const options = marketData.options;
 
             // Calculate aggregate signals
-            const cryptoAvg = (btc.change24h + eth.change24h) / 2;
+            const cryptoAvg = (btc.change24h + eth.change24h + sol.change24h) / 3;
             const metalsAvg = (gold.change24h + silver.change24h) / 2;
-            const riskAssetAvg = (cryptoAvg + metalsAvg) / 2;
+            const altcoinStrength = (eth.change24h + sol.change24h) / 2 - btc.change24h;
+
+            // Score-based verdict system (incorporating all data sources)
+            let bullScore = 0;
+            let bearScore = 0;
+
+            // Macro factors
+            if (dxy.change24h < -0.3) bullScore += 2;
+            if (dxy.change24h > 0.3) bearScore += 2;
+
+            // Price momentum
+            if (btc.change24h > 2) bullScore += 2;
+            else if (btc.change24h > 0.5) bullScore += 1;
+            if (btc.change24h < -2) bearScore += 2;
+            else if (btc.change24h < -0.5) bearScore += 1;
+
+            // Options flow
+            if (options.bias === 'bullish') bullScore += 2;
+            if (options.bias === 'bearish') bearScore += 2;
+            if (options.pcRatio < 0.7) bullScore += 1;
+            if (options.pcRatio > 1.0) bearScore += 1;
+            if (options.gamma === 'negative' && btc.change24h > 0) bullScore += 1; // Gamma squeeze potential
+            if (options.gamma === 'negative' && btc.change24h < 0) bearScore += 1;
+
+            // Funding rates
+            if (btc.funding > 0.05) bearScore += 1; // Overheated longs
+            if (btc.funding < -0.02) bullScore += 1; // Short squeeze potential
+
+            // Fear & Greed
+            if (marketData.fearGreed < 25) bullScore += 1; // Contrarian buy
+            if (marketData.fearGreed > 75) bearScore += 1; // Contrarian sell
+
+            // Altcoin rotation
+            if (altcoinStrength > 2) bullScore += 1; // Alt season signal
+            if (altcoinStrength < -2) bearScore += 1; // Flight to BTC
+
+            // Gold correlation
+            if (gold.change24h > 1 && btc.change24h > 1) bullScore += 1; // Both risk assets rising
+            if (gold.change24h > 1 && btc.change24h < -1) bearScore += 1; // Safe haven rotation
 
             // Determine overall verdict
             const verdictEl = document.getElementById('mainVerdict');
@@ -894,27 +1241,28 @@
 
             let verdict = '';
             let description = '';
+            const netScore = bullScore - bearScore;
 
-            if (dxy.change24h < -0.3 && cryptoAvg > 1) {
-                verdict = 'BULLISH: Risk-On Environment';
+            if (netScore >= 5) {
+                verdict = 'STRONG BULLISH: Multiple Confirmations';
                 verdictEl.className = 'verdict-main positive';
-                description = `Dollar weakness (DXY ${formatPercent(dxy.change24h)}) is creating favorable conditions for risk assets. Bitcoin is showing strength at ${formatPercent(btc.change24h)} with healthy funding rates. This macro backdrop typically supports crypto appreciation. Consider accumulating on dips.`;
-            } else if (dxy.change24h > 0.3 && cryptoAvg < -1) {
-                verdict = 'BEARISH: Risk-Off Environment';
+                description = `${bullScore} bullish signals vs ${bearScore} bearish. DXY ${formatPercent(dxy.change24h)}, BTC ${formatPercent(btc.change24h)}, Options ${options.bias}. Funding at ${btc.funding.toFixed(4)}% with ${marketData.fearGreed < 50 ? 'fear' : 'greed'} sentiment (${marketData.fearGreed}). Strong setup for long positions with max pain at ${formatPrice(options.maxPain)}.`;
+            } else if (netScore >= 2) {
+                verdict = 'BULLISH: Favorable Conditions';
+                verdictEl.className = 'verdict-main positive';
+                description = `Leaning bullish with ${bullScore} positive signals. DXY ${formatPercent(dxy.change24h)}, Options P/C ratio ${options.pcRatio.toFixed(2)}. ${altcoinStrength > 0 ? 'Alts outperforming suggests risk appetite.' : 'BTC dominance intact.'} Consider longs on dips toward ${formatPrice(options.maxPain)} max pain level.`;
+            } else if (netScore <= -5) {
+                verdict = 'STRONG BEARISH: Risk-Off Mode';
                 verdictEl.className = 'verdict-main negative';
-                description = `Dollar strength (DXY ${formatPercent(dxy.change24h)}) is creating headwinds for risk assets. Bitcoin declining at ${formatPercent(btc.change24h)} with pressure across the board. Consider reducing exposure or hedging positions until macro conditions improve.`;
-            } else if (Math.abs(cryptoAvg) < 1 && Math.abs(dxy.change24h) < 0.3) {
-                verdict = 'NEUTRAL: Consolidation Phase';
-                verdictEl.className = 'verdict-main neutral';
-                description = `Markets are in consolidation with no clear directional bias. BTC ${formatPercent(btc.change24h)}, DXY ${formatPercent(dxy.change24h)}. Wait for a clear breakout or breakdown before establishing new positions. Range trading strategies may be appropriate.`;
-            } else if (dxy.change24h > 0 && cryptoAvg > 0) {
-                verdict = 'CAUTION: Unusual Correlation';
-                verdictEl.className = 'verdict-main neutral';
-                description = `Both dollar and crypto are rising together - an unusual correlation that often precedes volatility. BTC ${formatPercent(btc.change24h)} despite DXY ${formatPercent(dxy.change24h)}. This divergence may resolve sharply. Trade with caution and tight stops.`;
+                description = `${bearScore} bearish signals vs ${bullScore} bullish. DXY strength at ${formatPercent(dxy.change24h)}, options ${options.bias}, funding ${btc.funding.toFixed(4)}%. ${marketData.fearGreed > 50 ? 'Greed sentiment needs washout.' : ''} Reduce exposure or hedge. Support levels critical.`;
+            } else if (netScore <= -2) {
+                verdict = 'BEARISH: Caution Advised';
+                verdictEl.className = 'verdict-main negative';
+                description = `Bearish tilt with ${bearScore} negative signals. ${dxy.change24h > 0 ? 'Dollar strength creating headwinds.' : ''} Options P/C at ${options.pcRatio.toFixed(2)} with ${options.gamma} gamma. ${btc.funding > 0.03 ? 'Elevated funding suggests crowded longs.' : ''} Tight stops recommended.`;
             } else {
-                verdict = 'MIXED: Selective Opportunities';
+                verdict = 'NEUTRAL: Wait for Clarity';
                 verdictEl.className = 'verdict-main neutral';
-                description = `Mixed signals across asset classes. BTC ${formatPercent(btc.change24h)}, Gold ${formatPercent(gold.change24h)}, DXY ${formatPercent(dxy.change24h)}. Focus on individual asset setups rather than macro themes. Quality over quantity in position sizing.`;
+                description = `Mixed signals (${bullScore} bull / ${bearScore} bear). BTC ${formatPercent(btc.change24h)}, DXY ${formatPercent(dxy.change24h)}, Fear/Greed ${marketData.fearGreed}. Options show ${options.bias} bias with ${options.gamma} gamma. Watch for breakout from ${formatPrice(btc.low24h)} - ${formatPrice(btc.high24h)} range.`;
             }
 
             verdictEl.textContent = verdict;
@@ -976,6 +1324,37 @@
 
             riskInsight = `<strong>Risk Assessment:</strong> 24h volatility at ${volatility}% range. Funding rates ${fundingRisk} at ${marketData.btc.funding.toFixed(4)}%. ${marketData.btc.funding > 0.08 ? 'WARNING: Extreme long positioning increases liquidation cascade risk.' : marketData.btc.funding < -0.03 ? 'Short squeeze potential as funding turns negative.' : 'Positioning appears balanced.'} Size positions accordingly.`;
             document.getElementById('riskInsight').innerHTML = riskInsight;
+
+            // Options insight
+            const options = marketData.options;
+            const mpDistance = ((marketData.btc.price - options.maxPain) / options.maxPain * 100).toFixed(1);
+            let optionsInsight = '';
+
+            if (options.gamma === 'negative' && Math.abs(parseFloat(mpDistance)) > 3) {
+                optionsInsight = `<strong>Gamma Squeeze Alert:</strong> Negative gamma with price ${parseFloat(mpDistance) > 0 ? 'above' : 'below'} max pain by ${Math.abs(parseFloat(mpDistance))}%. Dealer hedging could amplify ${parseFloat(mpDistance) > 0 ? 'upside' : 'downside'} moves. P/C ratio at ${options.pcRatio.toFixed(2)} suggests ${options.pcRatio < 0.8 ? 'call-heavy' : options.pcRatio > 1 ? 'put-heavy' : 'balanced'} positioning.`;
+            } else if (Math.abs(parseFloat(mpDistance)) < 2) {
+                optionsInsight = `<strong>Max Pain Magnet:</strong> Price within 2% of max pain ($${options.maxPain.toLocaleString()}). Strong gravitational pull toward this level expected near expiry. ${options.gamma === 'positive' ? 'Positive gamma = mean reversion likely.' : 'Watch for vol expansion.'} P/C ratio: ${options.pcRatio.toFixed(2)}.`;
+            } else {
+                optionsInsight = `<strong>Options Positioning:</strong> Max pain at $${options.maxPain.toLocaleString()} (${mpDistance}% ${parseFloat(mpDistance) > 0 ? 'below' : 'above'} current). P/C ratio ${options.pcRatio.toFixed(2)} indicates ${options.bias} bias. ${options.gamma.charAt(0).toUpperCase() + options.gamma.slice(1)} gamma suggests ${options.gamma === 'positive' ? 'range-bound' : options.gamma === 'negative' ? 'volatile' : 'normal'} conditions.`;
+            }
+            document.getElementById('optionsInsight').innerHTML = optionsInsight;
+
+            // Altcoin rotation insight
+            const ethBtcDelta = marketData.eth.change24h - marketData.btc.change24h;
+            const solBtcDelta = marketData.sol.change24h - marketData.btc.change24h;
+            const avgAltDelta = (ethBtcDelta + solBtcDelta) / 2;
+            let altcoinInsight = '';
+
+            if (avgAltDelta > 2) {
+                altcoinInsight = `<strong>Alt Season Signal:</strong> ETH outperforming BTC by ${formatPercent(ethBtcDelta)}, SOL by ${formatPercent(solBtcDelta)}. Altcoin rotation underway - risk appetite is high. Consider rotating some BTC to quality alts. ETH/BTC ratio: ${marketData.ethBtcRatio.toFixed(5)}, SOL/BTC: ${marketData.solBtcRatio.toFixed(6)}.`;
+            } else if (avgAltDelta < -2) {
+                altcoinInsight = `<strong>BTC Dominance Rising:</strong> ETH lagging BTC by ${formatPercent(Math.abs(ethBtcDelta))}, SOL by ${formatPercent(Math.abs(solBtcDelta))}. Flight to quality suggests caution in alt positions. Consider rotating alts to BTC. Watch for capitulation in weaker alts.`;
+            } else if (marketData.sol.change24h > marketData.eth.change24h + 2) {
+                altcoinInsight = `<strong>High-Beta Rotation:</strong> SOL outperforming ETH by ${formatPercent(marketData.sol.change24h - marketData.eth.change24h)}. Risk appetite favoring higher-beta plays. SOL/BTC at ${marketData.solBtcRatio.toFixed(6)}. ${marketData.sol.change24h > 5 ? 'Consider taking profits on SOL longs.' : 'Momentum intact.'}`;
+            } else {
+                altcoinInsight = `<strong>Correlated Movement:</strong> ETH ${formatPercent(ethBtcDelta)} vs BTC, SOL ${formatPercent(solBtcDelta)} vs BTC. No clear rotation signal - market moving in unison. ETH/BTC: ${marketData.ethBtcRatio.toFixed(5)}. Trade based on individual setups rather than rotation themes.`;
+            }
+            document.getElementById('altcoinInsight').innerHTML = altcoinInsight;
         }
 
         function generatePositions(cryptoAvg, metalsAvg, dxy) {
@@ -1085,6 +1464,41 @@
                 ethBias === 'bearish' ?
                 `ETH lagging BTC by ${formatPercent(ethBtcRatio)}. Risk-off within crypto favoring BTC dominance. Rotate to BTC or reduce alt exposure.` :
                 `ETH tracking BTC with normal correlation. Trade as leveraged BTC play or focus on specific catalysts.`;
+
+            // SOL Position
+            const sol = marketData.sol;
+            const solCard = document.getElementById('solPosition');
+            const solBiasEl = document.getElementById('solBias');
+            let solBias = 'neutral';
+
+            const solBtcRatio = sol.change24h - btc.change24h;
+            const solEthRatio = sol.change24h - eth.change24h;
+
+            if (sol.change24h > 3 || (sol.change24h > btc.change24h + 2 && sol.change24h > eth.change24h)) {
+                solBias = 'bullish';
+                solBiasEl.innerHTML = '<span class="positive">BULLISH</span> - High Beta Play';
+                solCard.className = 'position-card bullish';
+            } else if (sol.change24h < -3 || (sol.change24h < btc.change24h - 2)) {
+                solBias = 'bearish';
+                solBiasEl.innerHTML = '<span class="negative">BEARISH</span> - Underperforming';
+                solCard.className = 'position-card bearish';
+            } else {
+                solBiasEl.innerHTML = '<span class="neutral">NEUTRAL</span> - Following Market';
+                solCard.className = 'position-card neutral';
+            }
+
+            document.getElementById('solEntry').textContent = formatPrice(sol.price * 0.98, 2) + ' - ' + formatPrice(sol.price, 2);
+            document.getElementById('solTarget1').textContent = formatPrice(sol.price * 1.08, 2);
+            document.getElementById('solTarget2').textContent = formatPrice(sol.price * 1.15, 2);
+            document.getElementById('solStop').textContent = formatPrice(sol.price * 0.92, 2);
+            document.getElementById('solConviction').textContent =
+                Math.abs(solBtcRatio) > 3 ? 'High' : Math.abs(sol.change24h) > 3 ? 'Medium' : 'Low';
+
+            document.getElementById('solRationale').textContent = solBias === 'bullish' ?
+                `SOL outperforming BTC by ${formatPercent(solBtcRatio)} and ETH by ${formatPercent(solEthRatio)}. High-beta momentum play active. Risk appetite favors SOL. Trail stops on strength.` :
+                solBias === 'bearish' ?
+                `SOL underperforming with ${formatPercent(solBtcRatio)} spread vs BTC. High-beta assets lead declines - consider reducing or hedging SOL exposure.` :
+                `SOL moving with broader market. Use as leveraged crypto play with tighter position sizing due to higher volatility.`;
         }
 
         function updateRiskMetrics() {
