@@ -677,7 +677,7 @@
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let currentTheme = localStorage.getItem('dxy-theme') || 'night';
+        let currentTheme = localStorage.getItem('dashboard-theme') || 'night';
 
         // Global state
         let marketData = {
@@ -744,7 +744,7 @@
                 currentTheme = 'day';
             }
 
-            localStorage.setItem('dxy-theme', currentTheme);
+            localStorage.setItem('dashboard-theme', currentTheme);
             initChart();
         }
 
@@ -1263,7 +1263,7 @@
 
             new TradingView.widget({
                 "autosize": true,
-                "symbol": "ICEUS:DX1!",
+                "symbol": "TVC:DXY",
                 "interval": "240",
                 "timezone": "Etc/UTC",
                 "theme": isDark ? "dark" : "light",
@@ -1274,10 +1274,6 @@
                 "hide_side_toolbar": false,
                 "allow_symbol_change": true,
                 "container_id": "tradingview_chart",
-                "compare_symbol": [
-                    {"symbol": "BINANCE:BTCUSDT", "position": "SameScale"},
-                    {"symbol": "TVC:GOLD", "position": "SameScale"}
-                ],
                 "hide_top_toolbar": false,
                 "save_image": false,
                 "backgroundColor": isDark ? "#0a0a0a" : "#ffffff",

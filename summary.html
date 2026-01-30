@@ -704,7 +704,7 @@
     </div>
 
     <script>
-        let currentTheme = localStorage.getItem('summary-theme') || 'night';
+        let currentTheme = localStorage.getItem('dashboard-theme') || 'night';
 
         // Global market data
         let marketData = {
@@ -748,7 +748,7 @@
                 currentTheme = 'day';
             }
 
-            localStorage.setItem('summary-theme', currentTheme);
+            localStorage.setItem('dashboard-theme', currentTheme);
         }
 
         // Fetch all market data

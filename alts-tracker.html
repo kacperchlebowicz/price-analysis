@@ -553,7 +553,7 @@
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let currentTheme = localStorage.getItem('alts-theme') || 'night';
+        let currentTheme = localStorage.getItem('dashboard-theme') || 'night';
 
         let marketData = {
             btc: { price: 0, change24h: 0, funding: 0, volume: 0, high24h: 0, low24h: 0 },
@@ -606,7 +606,7 @@
                 button.textContent = 'Night Mode';
                 currentTheme = 'day';
             }
-            localStorage.setItem('alts-theme', currentTheme);
+            localStorage.setItem('dashboard-theme', currentTheme);
             initChart();
         }
 
