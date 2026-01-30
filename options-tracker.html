@@ -38,132 +38,155 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            padding: 40px 20px;
             line-height: 1.6;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; }
+        /* App Layout */
+        .app-layout { display: flex; min-height: 100vh; }
 
-        /* Navigation */
-        .nav {
-            display: flex;
-            gap: 8px;
-            padding: 12px 20px;
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
             background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            margin: -40px -20px 40px -20px;
-            flex-wrap: wrap;
-            align-items: center;
+            border-right: 1px solid var(--border);
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
         }
-
-        .nav-link {
+        .sidebar-title {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-tertiary);
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+        .sidebar-nav { flex: 1; }
+        .sidebar-link {
+            display: block;
+            padding: 12px 20px;
             color: var(--text-secondary);
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85em;
+            font-size: 0.9em;
+            border-left: 3px solid transparent;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
-            white-space: nowrap;
         }
-
-        .nav-link:hover {
+        .sidebar-link:hover {
             color: var(--text-primary);
             background: var(--bg-primary);
-            border-color: var(--border);
         }
-
-        .nav-link.active {
+        .sidebar-link.active {
             color: var(--text-primary);
+            border-left-color: var(--accent);
             background: var(--bg-primary);
-            border-color: var(--border);
-            font-weight: 500;
         }
-
-        /* Dropdown Navigation */
-        .nav-dropdown {
-            display: none;
-            position: relative;
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
         }
-
-        .nav-dropdown-btn {
-            background: var(--bg-secondary);
+        .sidebar-theme-toggle {
+            width: 100%;
+            background: var(--bg-primary);
             border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 16px;
-            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85em;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-
-        .nav-dropdown-btn:hover {
+        .sidebar-theme-toggle:hover {
+            color: var(--text-primary);
             border-color: var(--text-tertiary);
         }
 
-        .nav-dropdown-btn::after {
-            content: "▼";
-            font-size: 0.7em;
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            z-index: 1000;
+            align-items: center;
+            justify-content: space-between;
         }
-
+        .mobile-nav-title {
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .mobile-nav-controls { display: flex; gap: 8px; align-items: center; }
+        .mobile-theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75em;
+        }
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-dropdown-btn::after { content: "▼"; font-size: 0.6em; }
         .nav-dropdown-content {
             display: none;
             position: absolute;
             top: 100%;
-            left: 0;
+            right: 0;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 6px;
             min-width: 200px;
-            z-index: 1000;
             margin-top: 4px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1001;
         }
-
-        .nav-dropdown-content.show {
-            display: block;
-        }
-
+        .nav-dropdown-content.show { display: block; }
         .nav-dropdown-content a {
             display: block;
-            padding: 10px 16px;
+            padding: 12px 16px;
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.85em;
             border-bottom: 1px solid var(--border);
         }
+        .nav-dropdown-content a:last-child { border-bottom: none; }
+        .nav-dropdown-content a:hover { background: var(--bg-primary); color: var(--text-primary); }
+        .nav-dropdown-content a.active { color: var(--text-primary); font-weight: 500; }
 
-        .nav-dropdown-content a:last-child {
-            border-bottom: none;
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 40px 20px;
         }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        .nav-dropdown-content a:hover {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        .nav-dropdown-content a.active {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 900px) {
-            .nav-links {
-                display: none;
-            }
-            .nav-dropdown {
-                display: block;
-            }
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .mobile-nav { display: flex; }
+            .main-content { margin-left: 0; padding-top: 80px; }
         }
 
         .header {
@@ -530,32 +553,46 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <nav class="nav">
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">Bitcoin Analysis</a>
-                <a href="alts-tracker.html" class="nav-link">ETH & SOL vs BTC</a>
-                <a href="metals-crypto-tracker.html" class="nav-link">Metals / Crypto</a>
-                <a href="dxy-tracker.html" class="nav-link">DXY vs Crypto</a>
-                <a href="options-tracker.html" class="nav-link active">Options Flow</a>
-                <a href="summary.html" class="nav-link">AI Summary</a>
+    <div class="app-layout">
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Dashboards</div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">Bitcoin Analysis</a>
+                <a href="alts-tracker.html" class="sidebar-link">ETH & SOL vs BTC</a>
+                <a href="metals-crypto-tracker.html" class="sidebar-link">Metals / Crypto</a>
+                <a href="dxy-tracker.html" class="sidebar-link">DXY vs Crypto</a>
+                <a href="options-tracker.html" class="sidebar-link active">Options Flow</a>
+                <a href="summary.html" class="sidebar-link">AI Summary</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="sidebar-theme-toggle" onclick="toggleTheme()">Day Mode</button>
             </div>
-            <div class="nav-dropdown">
-                <button class="nav-dropdown-btn" onclick="toggleDropdown()">
-                    <span>Options Flow</span>
-                </button>
-                <div class="nav-dropdown-content" id="navDropdown">
-                    <a href="index.html">Bitcoin Analysis</a>
-                    <a href="alts-tracker.html">ETH & SOL vs BTC</a>
-                    <a href="metals-crypto-tracker.html">Metals / Crypto</a>
-                    <a href="dxy-tracker.html">DXY vs Crypto</a>
-                    <a href="options-tracker.html" class="active">Options Flow</a>
-                    <a href="summary.html">AI Summary</a>
+        </aside>
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <div class="mobile-nav-title">Options Flow</div>
+            <div class="mobile-nav-controls">
+                <button class="mobile-theme-toggle" onclick="toggleTheme()">Day</button>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown-btn" onclick="toggleDropdown()">Menu</button>
+                    <div class="nav-dropdown-content" id="navDropdown">
+                        <a href="index.html">Bitcoin Analysis</a>
+                        <a href="alts-tracker.html">ETH & SOL vs BTC</a>
+                        <a href="metals-crypto-tracker.html">Metals / Crypto</a>
+                        <a href="dxy-tracker.html">DXY vs Crypto</a>
+                        <a href="options-tracker.html" class="active">Options Flow</a>
+                        <a href="summary.html">AI Summary</a>
+                    </div>
                 </div>
             </div>
         </nav>
 
-        <div class="header">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <div class="header">
             <div class="header-content">
                 <h1>Options Flow</h1>
                 <div class="subtitle">BTC & Gold Options Impact on Price | Max Pain & Greeks</div>
@@ -740,16 +777,18 @@
             </div>
         </div>
 
-        <!-- Disclaimer -->
-        <div class="disclaimer">
-            <div class="disclaimer-title">Important Disclaimer</div>
-            <div class="disclaimer-text">
-                Options data is estimated based on market analysis and may not reflect exact exchange data.
-                Max pain calculations are theoretical and prices don't always converge to these levels.
-                This is not financial advice. Options trading involves significant risk of loss.
-                Always do your own research and consider consulting a financial advisor.
+                <!-- Disclaimer -->
+                <div class="disclaimer">
+                    <div class="disclaimer-title">Important Disclaimer</div>
+                    <div class="disclaimer-text">
+                        Options data is estimated based on market analysis and may not reflect exact exchange data.
+                        Max pain calculations are theoretical and prices don't always converge to these levels.
+                        This is not financial advice. Options trading involves significant risk of loss.
+                        Always do your own research and consider consulting a financial advisor.
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="https://s3.tradingview.com/tv.js"></script>
@@ -786,14 +825,20 @@
 
         function toggleTheme() {
             const html = document.documentElement;
-            const button = document.querySelector('.theme-toggle');
+            const sidebarBtn = document.querySelector('.sidebar-theme-toggle');
+            const mobileBtn = document.querySelector('.mobile-theme-toggle');
+            const headerBtn = document.querySelector('.theme-toggle');
             if (currentTheme === 'day') {
                 html.removeAttribute('data-theme');
-                button.textContent = 'Day Mode';
+                if (sidebarBtn) sidebarBtn.textContent = 'Day Mode';
+                if (mobileBtn) mobileBtn.textContent = 'Day';
+                if (headerBtn) headerBtn.textContent = 'Day Mode';
                 currentTheme = 'night';
             } else {
                 html.setAttribute('data-theme', 'day');
-                button.textContent = 'Night Mode';
+                if (sidebarBtn) sidebarBtn.textContent = 'Night Mode';
+                if (mobileBtn) mobileBtn.textContent = 'Night';
+                if (headerBtn) headerBtn.textContent = 'Night Mode';
                 currentTheme = 'day';
             }
             localStorage.setItem('dashboard-theme', currentTheme);
@@ -1216,10 +1261,14 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const button = document.querySelector('.theme-toggle');
+            const sidebarBtn = document.querySelector('.sidebar-theme-toggle');
+            const mobileBtn = document.querySelector('.mobile-theme-toggle');
+            const headerBtn = document.querySelector('.theme-toggle');
             if (currentTheme === 'day') {
                 document.documentElement.setAttribute('data-theme', 'day');
-                button.textContent = 'Night Mode';
+                if (sidebarBtn) sidebarBtn.textContent = 'Night Mode';
+                if (mobileBtn) mobileBtn.textContent = 'Night';
+                if (headerBtn) headerBtn.textContent = 'Night Mode';
             }
             fetchAllData();
             initChart();
